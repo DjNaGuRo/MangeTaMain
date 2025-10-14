@@ -1,0 +1,21 @@
+[project]
+name = "mangetamain"
+version = "0.1.0"
+description = "This project aims to analyze the profile of recipes that are well rated"
+authors = [
+    {name = "DJOUNANG NANA Guy Rostan (@DjNaGuRo)", email="guyrostan_nana@yahoo.fr"}
+]
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "streamlit (>=1.50.0,<2.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+package-mode = false
