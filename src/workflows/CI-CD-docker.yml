@@ -1,178 +1,113 @@
-name: CI/CD - Streamlit Docker Deploy
+name: CI/CD - Streamlit Cloud Deploy
 
-# Déclencheurs du workflow : quand exécuter ce pipeline
 on:
   push:
     branches:
-      - develop    # Déclenche sur push vers develop
-      - main       # Déclenche sur push vers main
-      - master     # Déclenche sur push vers master
+      - main
   pull_request:
     branches:
-      - develop    # Déclenche sur PR vers develop
-      - main       # Déclenche sur PR vers main
-      - master     # Déclenche sur PR vers master
+      - main
 
 jobs:
-  # Job 1 : Vérification de la qualité du code
+  # 1️⃣ Vérification de la qualité du code
   quality:
     name: Code Quality & Linting
-    runs-on: ubuntu-latest  # Utilise une machine virtuelle Ubuntu
-
-    steps:
-      # Étape 1 : Télécharger le code source du repository
-      - name: Checkout code
-        uses: actions/checkout@v4
-      
-      # Étape 2 : Installer Python 3.11 avec cache pip pour accélérer les builds
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-          cache: 'pip'  # Cache les packages pip pour accélérer
-
-      # Étape 3 : Installer les dépendances Python et les outils de linting
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip  # Met à jour pip
-          pip install -r requirements.txt     # Installe les dépendances du projet
-          pip install flake8 pydocstyle black # Installe les outils de qualité code
-
-      # Étape 4 : Vérifier le respect des standards PEP8 avec flake8
-      - name: Check PEP8 with flake8
-        run: flake8 src/ --max-line-length=88 --extend-ignore=E203,W503
-
-      # Étape 5 : Vérifier la qualité des docstrings avec le style Google
-      - name: Check docstring with Google style
-        run: pydocstyle src/ --convention=google
-
-      # Étape 6 : Vérifier le formatage du code avec Black
-      - name: Format with black
-        run: black --check src/
-
-  # Job 2 : Tests unitaires et couverture de code
-  test:
-    name: Unit Tests & Coverage
     runs-on: ubuntu-latest
-    needs: quality  # Attend que le job 'quality' soit terminé avec succès
 
     steps:
-      # Étape 1 : Télécharger le code source
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
-      
-      # Étape 2 : Configurer Python avec cache
-      - name: Set up Python
+
+      - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
           cache: 'pip'
 
-      # Étape 3 : Installer les dépendances et outils de test
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest pytest-cov coverage  # Outils pour tests et couverture
+          pip install flake8 pydocstyle black
 
-      # Étape 4 : Exécuter les tests avec pytest et générer le rapport de couverture
-      - name: Run tests with pytest
-        run: |
-          pytest tests/ -v --cov=src/ --cov-report=xml --cov-report=term-missing
-          # -v : mode verbose pour plus de détails
-          # --cov=src/ : mesure la couverture du dossier src
-          # --cov-report : génère des rapports de couverture
+      - name: Run flake8 (PEP8 check)
+        run: flake8 src/ tests/ app.py --max-line-length=88 --extend-ignore=E203,W503
 
-      # Étape 5 : Vérifier que la couverture de code atteint le seuil minimum
-      - name: Check coverage threshold
-        run: |
-          coverage report --fail-under=80  # Échoue si couverture < 80%
+      - name: Run pydocstyle (Google convention)
+        run: pydocstyle src/ --convention=google
 
-  # Job 3 : Construction et test de l'image Docker
-  docker-build:
-    name: Build & Test Docker
+      - name: Check formatting with Black
+        run: black --check src/ tests/ app.py
+
+  # 2️⃣ Tests unitaires + couverture
+  test:
+    name: Unit Tests & Coverage
     runs-on: ubuntu-latest
-    needs: test  # Attend que les tests soient passés
+    needs: quality
 
     steps:
-      # Étape 1 : Télécharger le code source
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Étape 2 : Configurer Docker Buildx pour les builds avancés
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      # Étape 3 : Construire l'image Docker sans la pousser
-      - name: Build Docker image
-        uses: docker/build-push-action@v5
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
         with:
-          context: .                    # Utilise le répertoire courant comme contexte
-          push: false                   # Ne pousse pas l'image (juste construction)
-          tags: my-streamlit-app:latest # Tag de l'image
-          cache-from: type=gha          # Utilise le cache GitHub Actions
-          cache-to: type=gha,mode=max   # Sauvegarde le cache
+          python-version: '3.11'
+          cache: 'pip'
 
-      # Étape 4 : Tester que le conteneur Docker fonctionne correctement
-      - name: Test Docker container
+      - name: Install dependencies
         run: |
-          # Lance le conteneur en arrière-plan
-          docker run -d --name test-app -p 8501:8501 my-streamlit-app:latest
-          sleep 30  # Attend que l'app démarre
-          # Teste l'endpoint de santé de Streamlit
-          curl -f http://localhost:8501/_stcore/health || exit 1
-          # Nettoie le conteneur de test
-          docker stop test-app
-          docker rm test-app
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov coverage
 
-  # Job 4 : Déploiement en production (uniquement sur main)
-  deploy:
-    name: Deploy to Production
+      - name: Run unit tests with coverage
+        run: |
+          pytest tests/ -v --cov=src --cov-report=xml --cov-report=term-missing
+
+      - name: Enforce 90% minimum coverage
+        run: coverage report --fail-under=90
+
+  # 3️⃣ Génération automatique de la documentation
+  docs:
+    name: Build documentation (Sphinx)
     runs-on: ubuntu-latest
-    needs: docker-build  # Attend que la construction Docker soit terminée
-    # Condition : seulement sur push vers main (pas sur PR)
+    needs: test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install sphinx sphinx-rtd-theme
+
+      - name: Build documentation
+        run: |
+          cd docs
+          make html
+
+  # 4️⃣ Déploiement sur Streamlit Cloud (notification)
+  deploy:
+    name: Streamlit Cloud Deploy (auto)
+    runs-on: ubuntu-latest
+    needs: docs
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
-      # Étape 1 : Télécharger le code source
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Étape 2 : Configurer Docker Buildx
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      # Étape 3 : Se connecter à Docker Hub avec les credentials stockés en secrets
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}  # Username Docker Hub (secret)
-          password: ${{ secrets.DOCKER_PASSWORD }}  # Token Docker Hub (secret)
-
-      # Étape 4 : Construire et pousser l'image vers Docker Hub
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true  # Cette fois, pousse l'image vers Docker Hub
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/my-streamlit-app:latest      # Tag latest
-            ${{ secrets.DOCKER_USERNAME }}/my-streamlit-app:${{ github.sha }}  # Tag avec SHA du commit
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      # Étape 5 : Déployer sur le serveur distant via SSH
-      - name: Deploy to remote server
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.HOST }}         # Adresse IP du serveur (secret)
-          username: ${{ secrets.USERNAME }} # Nom d'utilisateur SSH (secret)
-          key: ${{ secrets.SSH_KEY }}       # Clé privée SSH (secret)
-          script: |
-            # Tire la nouvelle image depuis Docker Hub
-            docker pull ${{ secrets.DOCKER_USERNAME }}/my-streamlit-app:latest
-            # Arrête l'ancien conteneur s'il existe (|| true évite l'erreur si inexistant)
-            docker stop my-streamlit-app || true
-            docker rm my-streamlit-app || true
-            # Lance le nouveau conteneur avec restart automatique
-            docker run -d --name my-streamlit-app -p 8501:8501 --restart unless-stopped ${{ secrets.DOCKER_USERNAME }}/my-streamlit-app:latest
+      - name: Notify Streamlit Cloud
+        run: |
+          echo "✅ CI/CD succeeded!"
+          echo "🚀 Streamlit Cloud will automatically update the app on push to main."
+          echo "📱 Ensure your repository is connected to Streamlit Cloud for auto-deploys."
