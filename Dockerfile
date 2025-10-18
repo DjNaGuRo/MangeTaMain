@@ -14,13 +14,12 @@ RUN apt-get update && apt-get install -y \
 # Désactiver la collecte de statistiques d'utilisation de Streamlit
 ENV STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
 
-# Copier les fichiers de dépendances en premier (pour optimiser le cache Docker)
-COPY requirements.txt ./
-COPY pyproject.toml ./
+# Copier le fichier pyproject.txt
+COPY pyproject.txt ./
 
-# Mettre à jour pip et installer les dépendances Python
+# Installer les dépendances Python
 RUN pip3 install --no-cache-dir --upgrade pip && \
-    pip3 install --no-cache-dir -r requirements.txt
+    pip3 install --no-cache-dir -r pyproject.txt
 
 # Copier le code source de l'application
 COPY src/ ./src/
