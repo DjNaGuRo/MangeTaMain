@@ -7,104 +7,305 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 # Configuration du thème personnalisé
-def set_custom_theme():
+def set_custom_theme(theme="Clair"):
     """Applique un thème personnalisé à l'application."""
-    st.markdown("""
+    
+    # Définir les couleurs selon le thème choisi
+    if theme == "Sombre":
+        colors = {
+            "primary": "#ffffff",
+            "secondary": "#f0f0f0",
+            "background": "#1a1a1a",
+            "text": "#e0e0e0",
+            "card_bg": "#000000",  # ← Changé en noir pur
+            "card_text": "#e0e0e0",
+            "header_gradient": "linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%)",
+            "sidebar_gradient": "linear-gradient(180deg, #3a3a3a 0%, #2d2d2d 100%)",
+            "border_color": "#3d3d3d",
+            "info_bg": "#000000",  # ← Changé en noir
+            "info_border": "#ffffff",
+            "warning_bg": "#1a1a1a",  # ← Noir légèrement plus clair
+            "warning_border": "#f39c12",
+            "success_bg": "#000000",  # ← Changé en noir
+            "success_border": "#ffffff",
+            "button_text": "#1a1a1a"
+        }
+    elif theme == "Auto":
+        colors = {
+            "primary": "#667eea",
+            "secondary": "#764ba2",
+            "background": "#F0F2F6",
+            "text": "#2C3E50",
+            "card_bg": "white",
+            "card_text": "#2C3E50",
+            "header_gradient": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            "sidebar_gradient": "linear-gradient(180deg, #667eea 0%, #764ba2 100%)",
+            "border_color": "#e0e0e0",
+            "info_bg": "#E8F4F8",
+            "info_border": "#2196F3",
+            "warning_bg": "#FFF3E0",
+            "warning_border": "#FF9800",
+            "success_bg": "#E8F5E9",
+            "success_border": "#4CAF50",
+            "button_text": "#ffffff"
+        }
+    else:  # Thème Clair
+        colors = {
+            "primary": "#667eea",
+            "secondary": "#764ba2",
+            "background": "#F0F2F6",
+            "text": "#2C3E50",
+            "card_bg": "white",
+            "card_text": "#2C3E50",
+            "header_gradient": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            "sidebar_gradient": "linear-gradient(180deg, #667eea 0%, #764ba2 100%)",
+            "border_color": "#e0e0e0",
+            "info_bg": "#E8F4F8",
+            "info_border": "#2196F3",
+            "warning_bg": "#FFF3E0",
+            "warning_border": "#FF9800",
+            "success_bg": "#E8F5E9",
+            "success_border": "#CFDBD0",
+            "button_text": "#ffffff"
+        }
+    
+    st.markdown(f"""
         <style>
         /* Couleurs principales */
-        :root {
-            --primary-color: #FF6B6B;
-            --secondary-color: #4ECDC4;
-            --background-color: #F7F7F7;
-            --text-color: #2C3E50;
-        }
+        :root {{
+            --primary-color: {colors['primary']};
+            --secondary-color: {colors['secondary']};
+            --background-color: {colors['background']};
+            --text-color: {colors['text']};
+        }}
+        
+        /* Appliquer le background à toute l'application */
+        .stApp {{
+            background-color: {colors['background']};
+            color: {colors['text']};
+        }}
+        
+        /* Background de la zone principale */
+        .main {{
+            background-color: {colors['background']};
+            color: {colors['text']};
+        }}
+        
+        /* Background des blocs de contenu */
+        .block-container {{
+            background-color: {colors['background']};
+            color: {colors['text']};
+        }}
+        
+        /* Forcer la couleur du texte pour tous les éléments */
+        .stMarkdown, p, span, div, label, h1, h2, h3, h4, h5, h6 {{
+            color: {colors['text']} !important;
+        }}
         
         /* Header stylisé */
-        .main-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .main-header {{
+            background: {colors['header_gradient']};
             padding: 2rem;
             border-radius: 10px;
-            color: white;
+            color: {colors['button_text']} !important;
             text-align: center;
             margin-bottom: 2rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
+        }}
         
-        /* Cards stylisées */
-        .metric-card {
-            background: white;
+        .main-header h1, .main-header p {{
+            color: {colors['button_text']} !important;
+        }}
+        
+        /* Cards stylisées - fond noir */
+        .metric-card {{
+            background: {colors['card_bg']};
             padding: 1.5rem;
             border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 4px rgba(255,255,255,0.1);
+            border-left: 4px solid {colors['primary']};
             margin: 1rem 0;
-        }
+            color: {colors['card_text']};
+        }}
+        
+        .metric-card h2, .metric-card h4, .metric-card p {{
+            color: {colors['card_text']} !important;
+        }}
         
         /* Sidebar personnalisée */
-        [data-testid="stSidebar"] {
-            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-        }
+        [data-testid="stSidebar"] {{
+            background: {colors['sidebar_gradient']};
+        }}
         
-        [data-testid="stSidebar"] .css-1d391kg {
-            color: white;
-        }
+        [data-testid="stSidebar"] * {{
+            color: white !important;
+        }}
         
         /* Boutons stylisés */
-        .stButton>button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+        .stButton>button {{
+            background: {colors['header_gradient']};
+            color: {colors['button_text']} !important;
             border: none;
             border-radius: 25px;
             padding: 0.5rem 2rem;
             font-weight: bold;
             transition: all 0.3s ease;
-        }
+        }}
         
-        .stButton>button:hover {
+        .stButton>button:hover {{
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
+            box-shadow: 0 4px 8px rgba(255,255,255,0.2);
+        }}
         
         /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn {{
+            from {{ opacity: 0; transform: translateY(20px); }}
+            to {{ opacity: 1; transform: translateY(0); }}
+        }}
         
-        .fade-in {
+        .fade-in {{
             animation: fadeIn 0.5s ease-out;
-        }
+        }}
         
-        /* Tables stylisées */
-        .dataframe {
+        /* Tables stylisées - fond noir */
+        .dataframe {{
             border-radius: 10px;
             overflow: hidden;
-        }
+            background-color: {colors['card_bg']};
+            color: {colors['card_text']};
+            border: 1px solid {colors['border_color']};
+        }}
         
-        /* Info boxes */
-        .info-box {
-            background: #E8F4F8;
-            border-left: 4px solid #2196F3;
+        .dataframe th {{
+            background-color: {colors['primary']} !important;
+            color: {colors['button_text']} !important;
+        }}
+        
+        .dataframe td {{
+            color: {colors['card_text']} !important;
+            background-color: {colors['card_bg']} !important;
+        }}
+        
+        /* Expanders avec fond noir */
+        [data-testid="stExpander"] {{
+            background-color: {colors['card_bg']};
+            border-radius: 10px;
+            border: 1px solid {colors['border_color']};
+        }}
+        
+        [data-testid="stExpander"] * {{
+            color: {colors['card_text']} !important;
+        }}
+        
+        /* Métriques avec fond noir */
+        [data-testid="stMetric"] {{
+            background-color: {colors['card_bg']};
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(255,255,255,0.05);
+            border: 1px solid {colors['border_color']};
+        }}
+        
+        [data-testid="stMetric"] * {{
+            color: {colors['card_text']} !important;
+        }}
+        
+        /* Input fields en mode sombre - fond noir */
+        input, textarea, select {{
+            background-color: {colors['card_bg']} !important;
+            color: {colors['text']} !important;
+            border: 1px solid {colors['border_color']} !important;
+        }}
+        
+        /* Date picker */
+        [data-testid="stDateInput"] {{
+            background-color: {colors['card_bg']};
+            color: {colors['text']};
+        }}
+        
+        /* Slider */
+        .stSlider {{
+            color: {colors['text']};
+        }}
+        
+        /* Selectbox - fond noir */
+        [data-baseweb="select"] {{
+            background-color: {colors['card_bg']} !important;
+        }}
+        
+        /* Multiselect */
+        [data-baseweb="tag"] {{
+            background-color: {colors['primary']} !important;
+            color: {colors['button_text']} !important;
+        }}
+        
+        /* Tabs */
+        .stTabs [data-baseweb="tab-list"] {{
+            background-color: {colors['card_bg']};
+        }}
+        
+        .stTabs [data-baseweb="tab"] {{
+            color: {colors['text']} !important;
+        }}
+        
+        /* Info boxes avec fond noir */
+        .info-box {{
+            background: {colors['info_bg']};
+            border-left: 4px solid {colors['info_border']};
             padding: 1rem;
             border-radius: 5px;
             margin: 1rem 0;
-        }
+            color: {colors['text']};
+            border: 1px solid {colors['border_color']};
+        }}
         
-        .warning-box {
-            background: #FFF3E0;
-            border-left: 4px solid #FF9800;
+        .info-box h3, .info-box h4, .info-box p, .info-box li {{
+            color: {colors['text']} !important;
+        }}
+        
+        .warning-box {{
+            background: {colors['warning_bg']};
+            border-left: 4px solid {colors['warning_border']};
             padding: 1rem;
             border-radius: 5px;
             margin: 1rem 0;
-        }
+            color: {colors['text']};
+            border: 1px solid {colors['border_color']};
+        }}
         
-        .success-box {
-            background: #E8F5E9;
-            border-left: 4px solid #4CAF50;
+        .warning-box h3, .warning-box h4, .warning-box p, .warning-box li {{
+            color: {colors['text']} !important;
+        }}
+        
+        .success-box {{
+            background: {colors['success_bg']};
+            border-left: 4px solid {colors['success_border']};
             padding: 1rem;
             border-radius: 5px;
             margin: 1rem 0;
-        }
+            color: {colors['text']};
+            border: 1px solid {colors['border_color']};
+        }}
+        
+        .success-box h3, .success-box h4, .success-box p, .success-box li {{
+            color: {colors['text']} !important;
+        }}
+        
+        /* Radio buttons et checkboxes */
+        [data-testid="stRadio"] label {{
+            color: {colors['text']} !important;
+        }}
+        
+        /* Download buttons */
+        .stDownloadButton button {{
+            background: {colors['primary']} !important;
+            color: {colors['button_text']} !important;
+        }}
+        
+        /* Progress bar */
+        .stProgress > div > div {{
+            background-color: {colors['primary']} !important;
+        }}
         </style>
     """, unsafe_allow_html=True)
 
@@ -117,15 +318,12 @@ def main():
         initial_sidebar_state="expanded"
     )
     
-    set_custom_theme()
+    # Initialiser le thème dans session_state AVANT la sidebar
+    if 'theme' not in st.session_state:
+        st.session_state.theme = "Clair"
     
-    # Header avec design moderne
-    st.markdown("""
-        <div class="main-header fade-in">
-            <h1>🍽️ MangeTaMain</h1>
-            <p>Analyse intelligente des recettes de cuisine</p>
-        </div>
-    """, unsafe_allow_html=True)
+    # Appliquer le thème sélectionné AVANT tout le reste
+    set_custom_theme(st.session_state.theme)
     
     # Sidebar avec icônes et design amélioré
     with st.sidebar:
@@ -143,12 +341,32 @@ def main():
         
         st.markdown("---")
         st.markdown("### ⚙️ Paramètres")
-        theme = st.selectbox("Thème", ["Clair", "Sombre", "Auto"])
+        
+        # Sélecteur de thème avec callback
+        def change_theme():
+            """Callback appelé quand le thème change."""
+            st.session_state.theme = st.session_state.theme_selector
+        
+        theme = st.selectbox(
+            "Thème", 
+            ["Clair", "Sombre", "Auto"],
+            index=["Clair", "Sombre", "Auto"].index(st.session_state.theme),
+            key="theme_selector",
+            on_change=change_theme
+        )
         
         st.markdown("---")
         st.markdown("### 📞 Contact")
         st.markdown("📧 contact@mangetamain.fr")
         st.markdown("🌐 www.mangetamain.fr")
+    
+    # Header avec design moderne
+    st.markdown("""
+        <div class="main-header fade-in">
+            <h1>🍽️ MangeTaMain</h1>
+            <p>Analyse de recettes les moins bien notées</p>
+        </div>
+    """, unsafe_allow_html=True)
     
     if selected_page == "Accueil":
         show_home_page_modern()
@@ -158,6 +376,10 @@ def main():
         show_visualizations_modern()
     elif selected_page == "Recommandations":
         show_recommendations_modern()
+
+# ...existing code... (gardez toutes les autres fonctions inchangées)
+
+# ...existing code... (gardez toutes les autres fonctions inchangées)
 
 def show_home_page_modern():
     """Page d'accueil avec design moderne."""
