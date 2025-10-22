@@ -1,2 +1,7 @@
 data/*.csv
 venv/
+*.pkl
+/corpora/*
+*.pickle
+*.zip
+/notebooks/nltk_data/*
