@@ -11,15 +11,22 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-# Désactiver la collecte de statistiques d'utilisation de Streamlit
-ENV STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
+# Variables d'environnement
+ENV STREAMLIT_BROWSER_GATHER_USAGE_STATS=false \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
 
-# Copier le fichier pyproject.txt
-COPY pyproject.txt ./
+# Installer Poetry
+RUN pip install poetry
 
-# Installer les dépendances Python
-RUN pip3 install --no-cache-dir --upgrade pip && \
-    pip3 install --no-cache-dir -r pyproject.txt
+# Configurer Poetry pour ne pas créer d'environnement virtuel
+RUN poetry config virtualenvs.create false
+
+# Copier les fichiers de configuration Poetry ET le README
+COPY pyproject.toml README.md ./
+
+# Installer SEULEMENT les dépendances (pas le projet comme package)
+RUN poetry install --only=main --no-root
 
 # Copier le code source de l'application
 COPY src/ ./src/
@@ -33,8 +40,8 @@ USER app
 EXPOSE 8501
 
 # Vérification de santé pour surveiller l'état du conteneur
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD curl --fail http://localhost:8501/_stcore/health || exit 1
 
 # Commande pour lancer l'application Streamlit au démarrage du conteneur
-ENTRYPOINT ["streamlit", "run", "src/main.py", "--server.port=8501", "--server.address=0.0.0.0"]
+CMD ["streamlit", "run", "src/main.py", "--server.port=8501", "--server.address=0.0.0.0"]
