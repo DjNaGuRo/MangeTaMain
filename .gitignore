@@ -1,4 +1,5 @@
-data/*.csv
+data/raw/*.csv
 venv/
 *.pkl
 /notebooks/subdir/nltk_data/*
+src/*pycache*
