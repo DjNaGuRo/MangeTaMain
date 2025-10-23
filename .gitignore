@@ -1,4 +1,4 @@
 data/*.csv
 venv/
 *.pkl
-/notebooks/nltk_data/*
+/notebooks/subdir/nltk_data/*

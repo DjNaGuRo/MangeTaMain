@@ -1,0 +1,23 @@
+[project]
+name = "eda_project"
+version = "0.1.0"
+description = "Exploratory Data Analysis project"
+readme = "README.md"
+requires-python = ">=3.10,<3.14"  # tu es en Python 3.13, donc on l’autorise
+
+# tu ajouteras tes deps plus tard via `poetry add ...`
+dependencies = []
+
+# Désactiver le “package mode” pour le moment (pas d’installation du code comme package)
+[tool.poetry]
+package-mode = false
+
+# Outils de dev (facultatif pour l’instant)
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+black = "^24.0.0"
+ruff = "^0.6.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
