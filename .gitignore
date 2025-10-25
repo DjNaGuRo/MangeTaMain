@@ -1,4 +1,5 @@
 data/raw/*.csv
+data/processed/*
 venv/
 *.pkl
 /notebooks/subdir/nltk_data/*
