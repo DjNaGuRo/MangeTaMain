@@ -3,10 +3,10 @@ name = "eda_project"
 version = "0.1.0"
 description = "Exploratory Data Analysis project"
 readme = "README.md"
-requires-python = ">=3.10,<3.14"  # tu es en Python 3.13, donc on l’autorise
+requires-python = ">=3.11,<3.14"  # tu es en Python 3.13, donc on l’autorise
 
 # tu ajouteras tes deps plus tard via `poetry add ...`
-dependencies = []
+dependencies = ["numpy (>=2.3.4,<3.0.0)", "pandas (>=2.3.3,<3.0.0)", "matplotlib (>=3.10.7,<4.0.0)"]
 
 # Désactiver le “package mode” pour le moment (pas d’installation du code comme package)
 [tool.poetry]
