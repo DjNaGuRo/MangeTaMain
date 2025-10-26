@@ -145,3 +145,69 @@ NUTRITION_THRESHOLDS = {
     "sugar": 500,
     "max_cooking_minutes": 43200,  # 1 mois
 }
+
+
+# catégorisation d'ingrésients
+
+# Ingrédients de base communs
+BASIC_INGREDIENTS = {
+    "salt",
+    "pepper",
+    "water",
+    "oil",
+    "butter",
+    "flour",
+    "sugar",
+    "onion",
+    "garlic",
+    "olive oil",
+    "black pepper",
+    "vegetable oil",
+}
+
+# Protéines
+PROTEINS = {
+    "chicken",
+    "beef",
+    "pork",
+    "fish",
+    "eggs",
+    "cheese",
+    "milk",
+    "cream",
+    "chicken breast",
+    "ground beef",
+    "bacon",
+    "ham",
+    "turkey",
+    "salmon",
+}
+
+# Légumes
+VEGETABLES = {
+    "onion",
+    "garlic",
+    "tomato",
+    "carrots",
+    "celery",
+    "potatoes",
+    "bell pepper",
+    "mushrooms",
+    "spinach",
+    "broccoli",
+}
+
+# Épices et herbes
+SPICES_HERBS = {
+    "salt",
+    "pepper",
+    "black pepper",
+    "paprika",
+    "cumin",
+    "oregano",
+    "basil",
+    "thyme",
+    "rosemary",
+    "parsley",
+    "cinnamon",
+}
