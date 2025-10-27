@@ -4,7 +4,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
-
+import matplotlib
+matplotlib.use("Agg")  # backend non graphique pour les tests
 # rendre importable "src/"
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"

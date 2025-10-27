@@ -1,4 +1,4 @@
-# src/visuals/interactions_univariate.py
+
 """
 Mes visualisations univariées / bivariées pour la table `interactions`.
 - Je veux un code clair, PEP8, sans sauvegarde PNG.
@@ -795,3 +795,72 @@ def plot_nutrition_distribution(
     plt.show()
 
     return _finalize(fig, show, return_fig)
+
+# ---------------------------------------------------------------------
+# BIVARIÉ — Durée (minutes) → groupes → insatisfaction
+# ---------------------------------------------------------------------
+def minutes_group_negative_reviews_bar(
+    merged_df: pd.DataFrame,
+    minutes_col: str = "minutes",
+    y_col: str = "negative_reviews",
+    show: bool = False,
+    return_fig: bool = False,
+):
+    """Trace le score moyen d’insatisfaction selon la durée de préparation.
+
+    Cette fonction regroupe les recettes selon la durée de préparation :
+        - Invalide si minutes = 0 ou manquant
+        - Courte ≤ 30 min
+        - Moyenne 31–180 min
+        - Longue > 180 min
+    Après le filtrage, j’affiche un barplot clair et lisible avec seaborn.
+    """
+
+    _need_cols(merged_df, [minutes_col, y_col])
+
+    # Fonction interne pour catégoriser les temps de préparation
+    def _regroup_time(m):
+        if pd.isna(m):
+            return "Invalide"
+        m = float(m)
+        if m == 0:
+            return "Invalide"
+        elif m <= 30:
+            return "Courte (≤30 min)"
+        elif m <= 180:
+            return "Moyenne (31–180 min)"
+        else:
+            return "Longue (>180 min)"
+
+    # Conversion des valeurs et suppression des entrées invalides
+    df = merged_df[[minutes_col, y_col]].copy()
+    df[minutes_col] = pd.to_numeric(df[minutes_col], errors="coerce")
+    df[y_col] = pd.to_numeric(df[y_col], errors="coerce")
+
+    df["time_group"] = df[minutes_col].apply(_regroup_time)
+    df = df[(df["time_group"] != "Invalide") & df[y_col].notna()]
+
+    # Ordre cohérent pour les catégories
+    order = ["Courte (≤30 min)", "Moyenne (31–180 min)", "Longue (>180 min)"]
+
+    # Création du graphique
+    fig, ax = plt.subplots(figsize=(7, 5))
+    sns.barplot(
+        data=df,
+        x="time_group",
+        y=y_col,
+        order=order,
+        palette="crest",
+        ci=None,
+        edgecolor="black",
+        ax=ax,
+    )
+
+    # Mise en forme du graphique
+    ax.set_title("Score moyen d’insatisfaction selon la durée de préparation", fontsize=13)
+    ax.set_xlabel("Catégorie de durée")
+    ax.set_ylabel("Score moyen d’insatisfaction")
+    ax.grid(axis="y", alpha=0.25)
+
+    return _finalize(fig, show, return_fig)
+
