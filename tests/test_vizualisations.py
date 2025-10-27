@@ -17,6 +17,9 @@ def make_fake_data(n=1000):
             "rating": np.random.randint(1, 6, n).astype(float),
             "review": ["ok"] * n,
             "binary_sentiment": np.random.choice([0, 1], n),
+            "negative_reviews": np.random.randint(0, 20, n),
+            "total_reviews": np.random.randint(1, 100, n),
+            "negative_score": np.random.rand(n) * 10,
         }
     )
 
@@ -43,6 +46,7 @@ def make_fake_recipes_data(n=500):
             "contributor_id": np.random.randint(1, 20, n),
             "ingredients": np.random.choice(ingredients_list, n),
             "minutes": np.random.randint(10, 120, n),
+            "n_ingredients": np.random.randint(1, 15, n),
             "n_steps": np.random.randint(1, 20, n),
             "tags": np.random.choice(tag_list, n),
             "calories": np.random.randint(100, 1000, n),
@@ -53,6 +57,15 @@ def make_fake_recipes_data(n=500):
             "carbohydrates": np.random.randint(1, 200, n),
         }
     )
+
+    # data frame factice pour la table de recette et interaction fusionnée
+
+
+def make_fake_merged_data(n=500):
+    recipes = make_fake_recipes_data(n)
+    interactions = make_fake_data(n)
+
+    return pd.merge(interactions, recipes, on="recipe_id", how="left")
 
 
 def test_rating_distribution_runs_without_error():
@@ -157,3 +170,43 @@ def test_plot_n_steps_distribution_runs_without_error(monkeypatch):
     monkeypatch.setattr(plt, "show", lambda: None)
     result = vis.plot_n_steps_distribution(df, show=False)
     assert result is None
+
+
+def test_minutes_group_negative_reviews_bar_runs_without_error(monkeypatch):
+    df = make_fake_merged_data()
+    monkeypatch.setattr(plt, "show", lambda: None)
+    result = vis.minutes_group_negative_reviews_bar(df, show=False)
+    assert result is None
+
+
+def test_analyze_tags_correlation_runs_without_error(monkeypatch):
+    df = make_fake_merged_data()
+    monkeypatch.setattr(plt, "show", lambda: None)
+    result = vis.analyze_tags_correlation(df, show=False)
+    assert result is None
+
+
+def test_nutrition_correlation_analysis_runs_without_error(monkeypatch):
+    df = make_fake_merged_data()
+    monkeypatch.setattr(plt, "show", lambda: None)
+    result = vis.nutrition_correlation_analysis(df, show=False)
+    assert result is None
+
+
+def test_plot_ingredients_vs_negative_score_runs_without_error(monkeypatch):
+    df = make_fake_merged_data()
+    monkeypatch.setattr(plt, "show", lambda: None)
+    result = vis.plot_ingredients_vs_negative_score(df, show=False)
+    assert result is None
+
+
+def test_spearman_correlation_runs_without_error():
+    df = make_fake_merged_data()
+    result = vis.spearman_correlation(
+        df,
+        col1="calories",
+        col2="negative_score",
+    )
+    assert result is not None
+    assert isinstance(result, float)
+    assert -1 <= result <= 1

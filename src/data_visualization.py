@@ -1,4 +1,3 @@
-
 """
 Mes visualisations univariées / bivariées pour la table `interactions`.
 - Je veux un code clair, PEP8, sans sauvegarde PNG.
@@ -796,6 +795,7 @@ def plot_nutrition_distribution(
 
     return _finalize(fig, show, return_fig)
 
+
 # ---------------------------------------------------------------------
 # BIVARIÉ — Durée (minutes) → groupes → insatisfaction
 # ---------------------------------------------------------------------
@@ -844,23 +844,225 @@ def minutes_group_negative_reviews_bar(
     order = ["Courte (≤30 min)", "Moyenne (31–180 min)", "Longue (>180 min)"]
 
     # Création du graphique
-    fig, ax = plt.subplots(figsize=(7, 5))
+    fig, ax = plt.subplots(1, 2, figsize=(14, 8))
     sns.barplot(
         data=df,
         x="time_group",
         y=y_col,
         order=order,
-        palette="crest",
-        ci=None,
+        errorbar=None,
         edgecolor="black",
-        ax=ax,
+        hue="time_group",
+        palette="crest",
+        ax=ax[0],
     )
 
     # Mise en forme du graphique
-    ax.set_title("Score moyen d’insatisfaction selon la durée de préparation", fontsize=13)
-    ax.set_xlabel("Catégorie de durée")
-    ax.set_ylabel("Score moyen d’insatisfaction")
-    ax.grid(axis="y", alpha=0.25)
+    ax[0].set_title(
+        "Score moyen d’insatisfaction selon la durée de préparation", fontsize=13
+    )
+    ax[0].set_xlabel("Catégorie de durée")
+    ax[0].set_ylabel("Score moyen d’insatisfaction")
+    ax[0].grid(axis="y", alpha=0.25)
+
+    sns.regplot(
+        data=df[df["minutes"] < 1000],  # on exclut les durées extrêmes
+        x="minutes",
+        y=y_col,
+        scatter_kws={"alpha": 0.3, "s": 10},
+        line_kws={"color": "red"},
+        ax=ax[1],
+    )
+    ax[1].set_xscale("log")
+    ax[1].set_title(
+        "Relation entre le temps de préparation et le score d’insatisfaction"
+    )
+    ax[1].set_xlabel("Durée de préparation (minutes, échelle log)")
+    ax[1].set_ylabel("Score d’insatisfaction")
 
     return _finalize(fig, show, return_fig)
 
+
+# fonction de corrélation de Spearman
+def spearman_correlation(df: pd.DataFrame, col1: str, col2: str) -> float:
+    """Calcule le coefficient de corrélation de Spearman entre deux colonnes.
+
+    Args:
+        df (pd.DataFrame): DataFrame contenant les données.
+        col1 (str): Nom de la première colonne.
+        col2 (str): Nom de la deuxième colonne.
+
+    Returns:
+        corr (float): Coefficient de corrélation.
+    """
+
+    corr = df[col1].corr(df[col2], method="spearman")
+
+    return corr
+
+
+###visualison de la distribution du nombre d'ingrédients par recette en fonction du score d'insatisfaction
+def plot_ingredients_vs_negative_score(
+    merged_df: pd.DataFrame, show: bool = False, return_fig: bool = False
+):
+    """Trace la relation entre le nombre d’ingrédients et le score d’insatisfaction.
+
+    Args:
+        merged_df (pd.DataFrame): DataFrame fusionné contenant les données.
+        show (bool, optional): Indique si le graphique doit être affiché. Par défaut False.
+        return_fig (bool, optional): Indique si la figure doit être retournée. Par défaut False.
+    Returns:
+        Optional[plt.Figure]: La figure matplotlib si return_fig est True, sinon None.
+    """
+    fig = plt.figure(figsize=(7, 5))
+    sns.scatterplot(
+        data=merged_df, x="n_ingredients", y="negative_reviews", alpha=0.3, s=10
+    )
+
+    plt.title("Relation entre le nombre d’ingrédients et le score d’insatisfaction")
+    plt.xlabel("Nombre d’ingrédients")
+    plt.ylabel("Score d’insatisfaction")
+    plt.show()
+
+    return _finalize(fig, show, return_fig)
+
+
+### analyse de la corrélation entre les tags et le score d'insatisfaction
+def analyze_tags_correlation(
+    merged_df: pd.DataFrame, show: bool = False, return_fig: bool = False
+):
+    """Analyse la corrélation entre les tags et le score d’insatisfaction.
+
+    Args:
+        merged_df (pd.DataFrame): DataFrame fusionné contenant les données.
+        show (bool, optional): Indique si le graphique doit être affiché. Par défaut False.
+        return_fig (bool, optional): Indique si la figure doit être retournée. Par défaut False.
+    Returns:
+        Optional[plt.Figure]: La figure matplotlib si return_fig est True, sinon None.
+    """
+
+    # Conversion sécurisée des chaînes en listes
+    def safe_eval(x):
+        if isinstance(x, list):
+            return x
+        if isinstance(x, str):
+            try:
+                return ast.literal_eval(x)
+            except:
+                return []
+        return []
+
+    merged_df["tags"] = merged_df["tags"].apply(safe_eval)
+
+    # Compter les tags les plus fréquents (en ignorant les NaN et erreurs)
+    tag_counts = Counter(
+        tag for tags in merged_df["tags"] if isinstance(tags, list) for tag in tags
+    )
+
+    top_tags = [t for t, _ in tag_counts.most_common(15)]
+    tag_sentiment = []
+
+    merged_df["negative_score"] = merged_df["negative_reviews"] * np.log1p(
+        merged_df["total_reviews"]
+    )
+    # On calcule le score moyen et le nombre de recettes par tag
+    for tag in top_tags:
+        subset = merged_df[
+            merged_df["tags"].apply(lambda tags: isinstance(tags, list) and tag in tags)
+        ]
+        mean_score = subset["negative_score"].mean()
+        count = len(subset)
+        tag_sentiment.append((tag, mean_score, count))
+
+    # Création d'un DataFrame propre
+    tag_df = pd.DataFrame(
+        tag_sentiment, columns=["tag", "mean_negative_score", "count"]
+    )
+    tag_df = tag_df.sort_values("mean_negative_score", ascending=False)
+
+    # Calcul fréquence + score moyen
+    tag_df["popularity"] = tag_df["count"]
+
+    # Fusion avec ceux les plus critiqués
+    combined = tag_df.copy()
+
+    fig, ax = plt.subplots(2, 1, figsize=(12, 12))
+
+    sns.barplot(
+        data=tag_df.head(10),
+        x="mean_negative_score",
+        y="tag",
+        palette="rocket",
+        hue="mean_negative_score",
+        ax=ax[0],
+    )
+    ax[0].set_title("Top 10 catégories de recettes les plus critiquées")
+    ax[0].set_xlabel("Score moyen d’insatisfaction")
+    ax[0].set_ylabel("Tag (type de recette)")
+    ax[0].grid(axis="x", alpha=0.25)
+
+    sns.scatterplot(
+        data=combined,
+        x="popularity",
+        y="mean_negative_score",
+        hue="mean_negative_score",
+        palette="coolwarm",
+        size="mean_negative_score",
+        sizes=(50, 200),
+        alpha=0.7,
+        ax=ax[1],
+    )
+
+    ax[1].set_title(
+        "Relation entre la popularité des tags et leur score d’insatisfaction"
+    )
+    ax[1].set_xlabel("Fréquence du tag (nombre de recettes)")
+    ax[1].set_ylabel("Score moyen d’insatisfaction")
+    ax[1].set_xscale("log")
+    ax[1].legend([], [], frameon=False)
+    fig.tight_layout()
+    plt.show()
+    return _finalize(fig, show, return_fig)
+
+
+# correlation entre les caractéristiques nutritionnelles et le score d'insatisfaction
+def nutrition_correlation_analysis(
+    merged_df: pd.DataFrame, show: bool = False, return_fig: bool = False
+):
+    """Analyse la corrélation entre les caractéristiques nutritionnelles et le score d’insatisfaction.
+
+    Args:
+        merged_df (pd.DataFrame): DataFrame fusionné contenant les données.
+        show (bool, optional): Indique si le graphique doit être affiché. Par défaut False.
+        return_fig (bool, optional): Indique si la figure doit être retournée. Par défaut False.
+    Returns:
+        Optional[plt.Figure]: La figure matplotlib si return_fig est True, sinon None.
+    """
+
+    nutrition_cols = [
+        "calories",
+        "sugar",
+        "protein",
+        "sodium",
+        "total_fat",
+        "carbohydrates",
+    ]
+
+    merged_df["negative_score"] = merged_df["negative_reviews"] * np.log1p(
+        merged_df["total_reviews"]
+    )
+
+    fig = plt.figure(figsize=(8, 5))
+    sns.heatmap(
+        merged_df[nutrition_cols + ["negative_score"]].corr(method="spearman"),
+        annot=True,
+        cmap="coolwarm",
+        center=0,
+    )
+    plt.title(
+        "Corrélation entre les variables nutritionnelles et le score d’insatisfaction"
+    )
+    plt.tight_layout()
+    plt.show()
+
+    return _finalize(fig, show, return_fig)
