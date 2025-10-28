@@ -1,1 +1,8 @@
-data/*.csv
+data/raw/*.csv
+data/processed/*
+venv/
+tests/__pycache__/*
+MangeTaMain/tests/__pycache__/*
+*.pkl
+/notebooks/subdir/nltk_data/*
+src/*pycache*
