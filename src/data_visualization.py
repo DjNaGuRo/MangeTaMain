@@ -270,6 +270,39 @@ def activity_bucket_bar(
     return _finalize(fig, show, return_fig)
 
 
+# fonction permettant de récupérer l'utilisateur avec le plus d'avis dont le rating est entre 1 et 3 et affiche ses notes
+def get_most_negative_user(interactions: pd.DataFrame) -> int:
+    """Récupère l'utilisateur avec le plus d'avis négatifs (notes 1 à 3) et affiche ses statistiques.
+    Args:
+        interactions (pd.DataFrame): DataFrame des interactions utilisateurs.
+    Returns:
+        dict :  Dictionnaire avec l'ID utilisateur et le décompte des notes 1 à 5.
+    """
+
+    most_negative_user_id = (
+        interactions.groupby("user_id")["rating"]
+        .apply(lambda x: (x <= 3).sum())
+        .idxmax()
+    )
+
+    most_negative_user_reviews = interactions[
+        interactions["user_id"] == most_negative_user_id
+    ]
+    rating_counts = (
+        most_negative_user_reviews["rating"]
+        .value_counts()
+        .reindex([1, 2, 3, 4, 5], fill_value=0)
+    )
+
+    # Compte des avis par note
+    review_counts = {
+        "user_id": most_negative_user_id,
+        "rating_counts": rating_counts.to_dict(),
+    }
+
+    return review_counts
+
+
 ## Anlyse des contributeurs
 def analyze_contributors(df_pp_raw_recipes: pd.DataFrame) -> Tuple[int, int]:
     """Analyse des contributeurs dans le dataset des recettes nettoyées.
@@ -305,10 +338,11 @@ def analyze_contributors(df_pp_raw_recipes: pd.DataFrame) -> Tuple[int, int]:
     # Top 20 contributeurs
     plt.subplot(2, 2, 3)
     top_20 = contributor_counts.head(20)
-    plt.bar(range(len(top_20)), top_20.values)
+    plt.bar(range(1, len(top_20) + 1), top_20.values)
     plt.xlabel("Rang du contributeur")
     plt.ylabel("Nombre de recettes")
     plt.title("Top 20 contributeurs")
+    plt.xticks(range(1, len(top_20) + 2, 2))
 
     # Courbe cumulative
     plt.subplot(2, 2, 4)

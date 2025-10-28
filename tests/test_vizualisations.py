@@ -210,3 +210,14 @@ def test_spearman_correlation_runs_without_error():
     assert result is not None
     assert isinstance(result, float)
     assert -1 <= result <= 1
+
+
+def test_get_most_negative_user_returns_correct_format():
+    df = make_fake_data()
+    result = vis.get_most_negative_user(df)
+    assert isinstance(result, dict)
+    assert "user_id" in result
+    assert "rating_counts" in result
+    assert isinstance(result["rating_counts"], dict)
+    for rating in range(1, 6):
+        assert rating in result["rating_counts"]
