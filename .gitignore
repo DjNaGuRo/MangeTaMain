@@ -1,3 +1,13 @@
 data/**/*.csv
 .venv/
+data/postgresDB/
 **/*/__pycache__/
+**/*.pyc
+.env
+.vscode/
+.DS_Store
+.idea/
+.ipynb_checkpoints/
+src/main.py
+logs/
+*.log   

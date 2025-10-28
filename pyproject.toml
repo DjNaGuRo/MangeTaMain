@@ -11,7 +11,10 @@ requires-python = ">=3.10"
 dependencies = [
     "streamlit (>=1.50.0,<2.0.0)",
     "matplotlib (>=3.10.7,<4.0.0)",
-    "seaborn (>=0.13.2,<0.14.0)"
+    "seaborn (>=0.13.2,<0.14.0)",
+    "psycopg2-binary (>=2.9.11,<3.0.0)",
+    "python-dotenv (>=1.2.1,<2.0.0)",
+    "sqlalchemy (>=2.0.44,<3.0.0)"
 ]
 
 
