@@ -1,0 +1,22 @@
+services:
+  db:
+    env_file:
+      - ./src/db/.env
+    image: postgres:18-alpine3.22
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+volumes:
+  db_data:
+    driver: local
+    name: mangetamain_db_data
+    driver_opts:
+      type: none
+      device: ${PWD}/data/postgresDB
+      o: bind
