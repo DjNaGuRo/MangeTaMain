@@ -119,4 +119,9 @@ L’objectif est d’obtenir un jeu de données propre et fiable pour la suite d
 
 2️ Analyse statistique
 
+## Commande pour lancer Streamlit
+streamlit run src/streamlit/app/streamlit_app.py
 
+## Interface graphique
+ Local URL: http://localhost:8501
+  Network URL: http://192.168.1.189:8501
