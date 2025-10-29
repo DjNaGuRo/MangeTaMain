@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Données volumineuses
 *.csv
 *.pkl
@@ -28,3 +29,13 @@ Thumbs.db
 
 # Docker
 .dockerignore
+=======
+data/raw/*.csv
+data/processed/*
+venv/
+tests/__pycache__/*
+MangeTaMain/tests/__pycache__/*
+*.pkl
+/notebooks/subdir/nltk_data/*
+src/*pycache*
+>>>>>>> main
