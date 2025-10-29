@@ -1,3 +1,30 @@
-data/*.csv
-.venv/
-**/*/__pycache__/rm
+# Données volumineuses
+*.csv
+*.pkl
+*.parquet
+*.xlsx
+*.xls
+
+# Cache et build
+__pycache__/
+*.pyc
+.pytest_cache/
+.streamlit/
+
+# Environnement
+.env
+.venv
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+.dockerignore

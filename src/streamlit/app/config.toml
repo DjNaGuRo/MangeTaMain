@@ -6,11 +6,12 @@ textColor = "#262730"
 font = "sans serif"
 
 [client]
-showErrorDetails = true
+maxMessageSize = 500
 
 [logger]
 level = "info"
 
 [server]
+maxMessageSize = 500
 headless = true
 port = 8501

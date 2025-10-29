@@ -5,8 +5,36 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
+from pathlib import Path
 
-# Configuration du thème personnalisé
+# ============================================================================
+# CHARGER LES DONNÉES
+# ============================================================================
+
+@st.cache_data
+def load_recipes_data():  # ← Changé de load_interactions_data
+    """Charge les données du CSV merged_cleaned.csv."""
+    csv_path = Path(__file__).parent.parent.parent / "data" / "processed" / "merged_cleaned.csv"
+    
+    print(f"📍 Chemin du CSV : {csv_path}")
+    print(f"📍 Le fichier existe ? {csv_path.exists()}")
+    
+    if not csv_path.exists():
+        st.error(f"❌ CSV non trouvé à : {csv_path}")
+        return None
+    
+    try:
+        df = pd.read_csv(csv_path)
+        st.success(f"✅ {len(df)} recettes chargées avec succès!")
+        return df
+    except Exception as e:
+        st.error(f"❌ Erreur lors du chargement du CSV : {e}")
+        return None
+
+# ============================================================================
+# CONFIGURATION DU THÈME
+# ============================================================================
+
 def set_custom_theme(theme="Clair"):
     """Applique un thème personnalisé à l'application."""
     
@@ -17,16 +45,16 @@ def set_custom_theme(theme="Clair"):
             "secondary": "#f0f0f0",
             "background": "#1a1a1a",
             "text": "#e0e0e0",
-            "card_bg": "#000000",  # ← Changé en noir pur
+            "card_bg": "#000000",
             "card_text": "#e0e0e0",
             "header_gradient": "linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%)",
             "sidebar_gradient": "linear-gradient(180deg, #3a3a3a 0%, #2d2d2d 100%)",
             "border_color": "#3d3d3d",
-            "info_bg": "#000000",  # ← Changé en noir
+            "info_bg": "#000000",
             "info_border": "#ffffff",
-            "warning_bg": "#1a1a1a",  # ← Noir légèrement plus clair
+            "warning_bg": "#1a1a1a",
             "warning_border": "#f39c12",
-            "success_bg": "#000000",  # ← Changé en noir
+            "success_bg": "#000000",
             "success_border": "#ffffff",
             "button_text": "#1a1a1a"
         }
@@ -79,30 +107,25 @@ def set_custom_theme(theme="Clair"):
             --text-color: {colors['text']};
         }}
         
-        /* Appliquer le background à toute l'application */
         .stApp {{
             background-color: {colors['background']};
             color: {colors['text']};
         }}
         
-        /* Background de la zone principale */
         .main {{
             background-color: {colors['background']};
             color: {colors['text']};
         }}
         
-        /* Background des blocs de contenu */
         .block-container {{
             background-color: {colors['background']};
             color: {colors['text']};
         }}
         
-        /* Forcer la couleur du texte pour tous les éléments */
         .stMarkdown, p, span, div, label, h1, h2, h3, h4, h5, h6 {{
             color: {colors['text']} !important;
         }}
         
-        /* Header stylisé */
         .main-header {{
             background: {colors['header_gradient']};
             padding: 2rem;
@@ -117,7 +140,6 @@ def set_custom_theme(theme="Clair"):
             color: {colors['button_text']} !important;
         }}
         
-        /* Cards stylisées - fond noir */
         .metric-card {{
             background: {colors['card_bg']};
             padding: 1.5rem;
@@ -132,7 +154,6 @@ def set_custom_theme(theme="Clair"):
             color: {colors['card_text']} !important;
         }}
         
-        /* Sidebar personnalisée */
         [data-testid="stSidebar"] {{
             background: {colors['sidebar_gradient']};
         }}
@@ -141,7 +162,6 @@ def set_custom_theme(theme="Clair"):
             color: white !important;
         }}
         
-        /* Boutons stylisés */
         .stButton>button {{
             background: {colors['header_gradient']};
             color: {colors['button_text']} !important;
@@ -157,7 +177,6 @@ def set_custom_theme(theme="Clair"):
             box-shadow: 0 4px 8px rgba(255,255,255,0.2);
         }}
         
-        /* Animations */
         @keyframes fadeIn {{
             from {{ opacity: 0; transform: translateY(20px); }}
             to {{ opacity: 1; transform: translateY(0); }}
@@ -167,7 +186,6 @@ def set_custom_theme(theme="Clair"):
             animation: fadeIn 0.5s ease-out;
         }}
         
-        /* Tables stylisées - fond noir */
         .dataframe {{
             border-radius: 10px;
             overflow: hidden;
@@ -186,7 +204,6 @@ def set_custom_theme(theme="Clair"):
             background-color: {colors['card_bg']} !important;
         }}
         
-        /* Expanders avec fond noir */
         [data-testid="stExpander"] {{
             background-color: {colors['card_bg']};
             border-radius: 10px;
@@ -197,7 +214,6 @@ def set_custom_theme(theme="Clair"):
             color: {colors['card_text']} !important;
         }}
         
-        /* Métriques avec fond noir */
         [data-testid="stMetric"] {{
             background-color: {colors['card_bg']};
             padding: 1rem;
@@ -210,36 +226,30 @@ def set_custom_theme(theme="Clair"):
             color: {colors['card_text']} !important;
         }}
         
-        /* Input fields en mode sombre - fond noir */
         input, textarea, select {{
             background-color: {colors['card_bg']} !important;
             color: {colors['text']} !important;
             border: 1px solid {colors['border_color']} !important;
         }}
         
-        /* Date picker */
         [data-testid="stDateInput"] {{
             background-color: {colors['card_bg']};
             color: {colors['text']};
         }}
         
-        /* Slider */
         .stSlider {{
             color: {colors['text']};
         }}
         
-        /* Selectbox - fond noir */
         [data-baseweb="select"] {{
             background-color: {colors['card_bg']} !important;
         }}
         
-        /* Multiselect */
         [data-baseweb="tag"] {{
             background-color: {colors['primary']} !important;
             color: {colors['button_text']} !important;
         }}
         
-        /* Tabs */
         .stTabs [data-baseweb="tab-list"] {{
             background-color: {colors['card_bg']};
         }}
@@ -248,7 +258,6 @@ def set_custom_theme(theme="Clair"):
             color: {colors['text']} !important;
         }}
         
-        /* Info boxes avec fond noir */
         .info-box {{
             background: {colors['info_bg']};
             border-left: 4px solid {colors['info_border']};
@@ -291,23 +300,24 @@ def set_custom_theme(theme="Clair"):
             color: {colors['text']} !important;
         }}
         
-        /* Radio buttons et checkboxes */
         [data-testid="stRadio"] label {{
             color: {colors['text']} !important;
         }}
         
-        /* Download buttons */
         .stDownloadButton button {{
             background: {colors['primary']} !important;
             color: {colors['button_text']} !important;
         }}
         
-        /* Progress bar */
         .stProgress > div > div {{
             background-color: {colors['primary']} !important;
         }}
         </style>
     """, unsafe_allow_html=True)
+
+# ============================================================================
+# FONCTION PRINCIPALE
+# ============================================================================
 
 def main():
     """Lance l'application Streamlit principale."""
@@ -318,14 +328,11 @@ def main():
         initial_sidebar_state="expanded"
     )
     
-    # Initialiser le thème dans session_state AVANT la sidebar
     if 'theme' not in st.session_state:
         st.session_state.theme = "Clair"
     
-    # Appliquer le thème sélectionné AVANT tout le reste
     set_custom_theme(st.session_state.theme)
     
-    # Sidebar avec icônes et design amélioré
     with st.sidebar:
         st.markdown("### 📋 Navigation")
         
@@ -342,9 +349,7 @@ def main():
         st.markdown("---")
         st.markdown("### ⚙️ Paramètres")
         
-        # Sélecteur de thème avec callback
         def change_theme():
-            """Callback appelé quand le thème change."""
             st.session_state.theme = st.session_state.theme_selector
         
         theme = st.selectbox(
@@ -355,12 +360,6 @@ def main():
             on_change=change_theme
         )
         
-        st.markdown("---")
-        st.markdown("### 📞 Contact")
-        st.markdown("📧 contact@mangetamain.fr")
-        st.markdown("🌐 www.mangetamain.fr")
-    
-    # Header avec design moderne
     st.markdown("""
         <div class="main-header fade-in">
             <h1>🍽️ MangeTaMain</h1>
@@ -377,14 +376,13 @@ def main():
     elif selected_page == "Recommandations":
         show_recommendations_modern()
 
-# ...existing code... (gardez toutes les autres fonctions inchangées)
-
-# ...existing code... (gardez toutes les autres fonctions inchangées)
+# ============================================================================
+# PAGE D'ACCUEIL
+# ============================================================================
 
 def show_home_page_modern():
     """Page d'accueil avec design moderne."""
     
-    # Section héro
     col1, col2 = st.columns([2, 1])
     
     with col1:
@@ -394,11 +392,10 @@ def show_home_page_modern():
         st.markdown("""
         <div class="info-box">
             <h3>🎯 Notre Mission</h3>
-            <p>Analyser de recettes de cuisine les moins bien notées et en proposant des solutions concrètes.</p>
+            <p>Analyser les recettes de cuisine les moins bien notées et proposer des solutions concrètes.</p>
         </div>
         """, unsafe_allow_html=True)
         
-        # Input personnalisé
         st.markdown("### 👤 Personnalisation")
         name = st.text_input("Entrez votre prénom :", placeholder="Ex: Marie")
         
@@ -414,23 +411,28 @@ def show_home_page_modern():
     
     with col2:
         st.markdown('<div class="fade-in">', unsafe_allow_html=True)
-        
-        # Statistiques en temps réel
         st.markdown("### 📊 Statistiques en direct")
         
-        metrics_data = {
-            "Recettes analysées": 1247,
-            "Notes moyennes": 3.8,
-            "Utilisateurs actifs": 523,
-            "Améliorations suggérées": 89
-        }
+        # Charger les données pour les statistiques réelles
+        df = load_recipes_data()
         
-        for metric, value in metrics_data.items():
-            st.metric(metric, value, delta=f"+{np.random.randint(5, 20)}%")
+        if df is not None:
+            # Adapter les noms de colonnes à votre CSV
+            st.metric("📋 Total recettes", len(df))
+            st.metric("📊 Colonnes", len(df.columns))
+            st.metric("⚠️ Valeurs manquantes", df.isnull().sum().sum())
+            
+            # Si vous avez une colonne 'note', afficher la moyenne
+            if 'note' in df.columns or 'rating' in df.columns:
+                note_col = 'note' if 'note' in df.columns else 'rating'
+                avg_note = df[note_col].mean()
+                st.metric("⭐ Note moyenne", f"{avg_note:.2f}")
+        else:
+            st.metric("📋 Total recettes", "N/A")
+            st.metric("📊 Colonnes", "N/A")
         
         st.markdown('</div>', unsafe_allow_html=True)
     
-    # Section fonctionnalités avec cards
     st.markdown("---")
     st.markdown("## 🚀 Fonctionnalités principales")
     
@@ -449,296 +451,183 @@ def show_home_page_modern():
             <div class="metric-card fade-in">
                 <h2 style="text-align: center;">{icon}</h2>
                 <h4 style="text-align: center;">{title}</h4>
-                <p style="text-align: center; color: #666;">{desc}</p>
+                <p style="text-align: center; font-size: 0.9em;">{desc}</p>
             </div>
             """, unsafe_allow_html=True)
+
+# ============================================================================
+# PAGE D'ANALYSE DES DONNÉES
+# ============================================================================
 
 def show_data_analysis_modern():
     """Page d'analyse avec design moderne."""
     st.markdown("## 📊 Analyse des données")
     
-    # Filtres avancés
+    # Charger les données
+    df = load_recipes_data()
+    
+    if df is None:
+        st.error("❌ Impossible de charger les données")
+        st.stop()
+    
     with st.expander("🔍 Filtres avancés", expanded=True):
         col1, col2, col3 = st.columns(3)
         
         with col1:
-            date_range = st.date_input("Période", [])
+            st.markdown("Période")
         with col2:
-            category = st.multiselect("Catégories", ["Entrées", "Plats", "Desserts"])
+            st.markdown("Catégories")
         with col3:
-            rating_range = st.slider("Notes", 1.0, 5.0, (1.0, 5.0))
-    
-    # Données d'exemple
-    np.random.seed(42)
-    sample_data = pd.DataFrame({
-        'recette_id': range(1, 101),
-        'nom_recette': [f"Recette {i}" for i in range(1, 101)],
-        'note_moyenne': np.random.uniform(1, 5, 100),
-        'nb_evaluations': np.random.randint(10, 1000, 100),
-        'temps_preparation': np.random.randint(15, 180, 100),
-        'difficulte': np.random.choice(['Facile', 'Moyen', 'Difficile'], 100)
-    })
+            st.markdown("Notes")
     
     # Métriques en cards
     col1, col2, col3, col4 = st.columns(4)
     
-    metrics = [
-        ("📋 Total recettes", len(sample_data), "green"),
-        ("⭐ Note moyenne", f"{sample_data['note_moyenne'].mean():.2f}", "blue"),
-        ("⚠️ Mal notées", len(sample_data[sample_data['note_moyenne'] < 3]), "red"),
-        ("⏱️ Temps moyen", f"{sample_data['temps_preparation'].mean():.0f} min", "orange")
-    ]
+    with col1:
+        st.metric("📋 Total recettes", len(df))
+    with col2:
+        st.metric("📊 Colonnes", len(df.columns))
+    with col3:
+        st.metric("⚠️ Valeurs manquantes", df.isnull().sum().sum())
+    with col4:
+        st.metric("📈 Lignes", len(df))
     
-    for col, (label, value, color) in zip([col1, col2, col3, col4], metrics):
-        with col:
-            delta = f"+{np.random.randint(1, 15)}%" if color in ["green", "blue"] else f"-{np.random.randint(1, 10)}%"
-            st.metric(label, value, delta)
-    
-    # Tableau interactif
     st.markdown("### 📋 Données détaillées")
     
-    # Ajout d'une barre de recherche
-    search = st.text_input("🔍 Rechercher une recette", "")
+    search = st.text_input("🔍 Rechercher", "")
     if search:
-        sample_data = sample_data[sample_data['nom_recette'].str.contains(search, case=False)]
+        mask = df.astype(str).applymap(lambda x: search.lower() in str(x).lower()).any(axis=1)
+        df_filtered = df[mask]
+    else:
+        df_filtered = df
     
-    st.dataframe(
-        sample_data,
-        use_container_width=True,
-        hide_index=True,
-        column_config={
-            "note_moyenne": st.column_config.ProgressColumn(
-                "Note",
-                format="%.2f ⭐",
-                min_value=0,
-                max_value=5,
-            ),
-            "nb_evaluations": st.column_config.NumberColumn(
-                "Évaluations",
-                format="%d 👥"
-            ),
-            "temps_preparation": st.column_config.NumberColumn(
-                "Temps (min)",
-                format="%d ⏱️"
-            )
-        }
+    # Sélectionner colonnes
+    col_select = st.multiselect(
+        "Colonnes à afficher",
+        df.columns.tolist(),
+        default=df.columns.tolist()[:5]  # 5 colonnes par défaut
     )
     
-    # Bouton d'export
-    col1, col2, col3 = st.columns([1, 1, 2])
+    # Pagination
+    rows_per_page = st.slider("Lignes par page", 10, 500, 50)
+    page_num = st.number_input("Page", min_value=1, value=1)
+    start_idx = (page_num - 1) * rows_per_page
+    end_idx = start_idx + rows_per_page
+    
+    total_pages = (len(df_filtered) + rows_per_page - 1) // rows_per_page
+    st.info(f"📊 Page {page_num}/{total_pages} | {len(df_filtered)} résultats")
+    
+    st.dataframe(df_filtered.iloc[start_idx:end_idx][col_select], use_container_width=True)
+    
+    col1, col2 = st.columns(2)
     with col1:
         st.download_button(
             "📥 Exporter CSV",
-            sample_data.to_csv(index=False).encode('utf-8'),
+            df_filtered.to_csv(index=False).encode('utf-8'),
             "recettes_analyse.csv",
             "text/csv"
         )
-    with col2:
-        st.download_button(
-            "📊 Exporter Excel",
-            sample_data.to_csv(index=False).encode('utf-8'),
-            "recettes_analyse.xlsx"
-        )
+    
+    st.markdown("### 📈 Statistiques descriptives")
+    st.dataframe(df.describe(), use_container_width=True)
+
+# ============================================================================
+# PAGE DE VISUALISATIONS
+# ============================================================================
 
 def show_visualizations_modern():
     """Page de visualisations avec Plotly."""
     st.markdown("## 📈 Visualisations interactives")
     
-    # Données d'exemple
-    np.random.seed(42)
-    notes = np.random.uniform(1, 5, 1000)
+    df = load_recipes_data()
+    
+    if df is None:
+        st.error("❌ Impossible de charger les données")
+        st.stop()
+    
+    numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+    
+    if not numeric_cols:
+        st.warning("⚠️ Aucune colonne numérique trouvée")
+        return
     
     tab1, tab2, tab3, tab4 = st.tabs(["📊 Distribution", "🔥 Top/Flop", "⏱️ Corrélations", "🎯 Insights"])
     
     with tab1:
-        # Histogramme avec Plotly
-        fig = px.histogram(
-            x=notes,
-            nbins=20,
-            title="Distribution des notes",
-            labels={'x': 'Note', 'y': 'Fréquence'},
-            color_discrete_sequence=['#667eea']
-        )
-        fig.update_layout(
-            plot_bgcolor='rgba(0,0,0,0)',
-            paper_bgcolor='rgba(0,0,0,0)',
-            font=dict(size=12)
-        )
-        st.plotly_chart(fig, use_container_width=True)
+        if len(numeric_cols) > 0:
+            col_selected = st.selectbox("Colonne", numeric_cols, key="viz_col")
+            fig = px.histogram(df, x=col_selected, nbins=20, title=f"Distribution de {col_selected}")
+            fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)')
+            st.plotly_chart(fig, use_container_width=True)
     
     with tab2:
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            # Top recettes
-            top_recipes = pd.DataFrame({
-                'Recette': [f'Recette {i}' for i in range(1, 11)],
-                'Note': np.random.uniform(4.5, 5.0, 10)
-            }).sort_values('Note', ascending=False)
-            
-            fig = px.bar(
-                top_recipes,
-                x='Note',
-                y='Recette',
-                orientation='h',
-                title='🏆 Top 10 Recettes',
-                color='Note',
-                color_continuous_scale='Greens'
-            )
-            st.plotly_chart(fig, use_container_width=True)
-        
-        with col2:
-            # Flop recettes
-            flop_recipes = pd.DataFrame({
-                'Recette': [f'Recette {i}' for i in range(1, 11)],
-                'Note': np.random.uniform(1.0, 2.5, 10)
-            }).sort_values('Note')
-            
-            fig = px.bar(
-                flop_recipes,
-                x='Note',
-                y='Recette',
-                orientation='h',
-                title='📉 Flop 10 Recettes',
-                color='Note',
-                color_continuous_scale='Reds'
-            )
-            st.plotly_chart(fig, use_container_width=True)
+        if len(numeric_cols) > 0:
+            col1, col2 = st.columns(2)
+            with col1:
+                st.info("📊 Top 10")
+            with col2:
+                st.info("📉 Flop 10")
     
     with tab3:
-        # Scatter plot
-        chart_data = pd.DataFrame({
-            'temps': np.random.randint(15, 180, 100),
-            'note': np.random.uniform(1, 5, 100),
-            'difficulte': np.random.choice(['Facile', 'Moyen', 'Difficile'], 100)
-        })
-        
-        fig = px.scatter(
-            chart_data,
-            x='temps',
-            y='note',
-            color='difficulte',
-            title='Corrélation Temps / Note / Difficulté',
-            labels={'temps': 'Temps de préparation (min)', 'note': 'Note moyenne'},
-            trendline="ols"
-        )
-        st.plotly_chart(fig, use_container_width=True)
+        if len(numeric_cols) >= 2:
+            col_x = st.selectbox("Axe X", numeric_cols, key="x_axis")
+            col_y = st.selectbox("Axe Y", numeric_cols, key="y_axis", index=1 if len(numeric_cols) > 1 else 0)
+            fig = px.scatter(df, x=col_x, y=col_y, title=f"{col_x} vs {col_y}", trendline="ols")
+            st.plotly_chart(fig, use_container_width=True)
     
     with tab4:
-        st.markdown("### 🎯 Insights clés")
-        
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.markdown("""
-            <div class="info-box">
-                <h4>📊 Observations principales</h4>
-                <ul>
-                    <li>68% des recettes ont une note > 3.5</li>
-                    <li>Les recettes rapides (<30min) sont mieux notées</li>
-                    <li>Forte corrélation entre simplicité et satisfaction</li>
-                </ul>
-            </div>
-            """, unsafe_allow_html=True)
-        
-        with col2:
-            st.markdown("""
-            <div class="warning-box">
-                <h4>⚠️ Points d'attention</h4>
-                <ul>
-                    <li>32% des recettes sous la moyenne</li>
-                    <li>Temps de préparation souvent sous-estimé</li>
-                    <li>Manque d'images pour 15% des recettes</li>
-                </ul>
-            </div>
-            """, unsafe_allow_html=True)
+        st.markdown("""
+        <div class="info-box">
+            <h4>📊 Observations</h4>
+            <ul>
+                <li>Données chargées avec succès</li>
+                <li>Visualisations interactives disponibles</li>
+            </ul>
+        </div>
+        """, unsafe_allow_html=True)
+
+# ============================================================================
+# PAGE DE RECOMMANDATIONS
+# ============================================================================
 
 def show_recommendations_modern():
     """Page de recommandations moderne."""
     st.markdown("## 🎯 Recommandations intelligentes")
     
-    # Système de scoring
     col1, col2 = st.columns([2, 1])
     
     with col1:
         st.markdown("### 💡 Suggestions d'amélioration")
         
         recommendations = [
-            {
-                "title": "Simplifier les recettes complexes",
-                "impact": "Élevé",
-                "effort": "Moyen",
-                "priority": 1,
-                "icon": "🎯"
-            },
-            {
-                "title": "Optimiser le temps de préparation",
-                "impact": "Moyen",
-                "effort": "Faible",
-                "priority": 2,
-                "icon": "⏱️"
-            },
-            {
-                "title": "Améliorer la présentation visuelle",
-                "impact": "Élevé",
-                "effort": "Élevé",
-                "priority": 3,
-                "icon": "📸"
-            },
-            {
-                "title": "Clarifier les instructions",
-                "impact": "Moyen",
-                "effort": "Faible",
-                "priority": 4,
-                "icon": "📝"
-            },
-            {
-                "title": "Ajouter des variantes",
-                "impact": "Faible",
-                "effort": "Moyen",
-                "priority": 5,
-                "icon": "🔄"
-            }
+            {"title": "Simplifier les recettes complexes", "impact": "Élevé", "priority": 1, "icon": "🎯"},
+            {"title": "Optimiser le temps de préparation", "impact": "Moyen", "priority": 2, "icon": "⏱️"},
+            {"title": "Améliorer la présentation visuelle", "impact": "Élevé", "priority": 3, "icon": "📸"},
         ]
         
         for rec in recommendations:
-            impact_color = {"Élevé": "🔴", "Moyen": "🟡", "Faible": "🟢"}
-            
             with st.expander(f"{rec['icon']} {rec['title']}", expanded=rec['priority'] <= 2):
-                col_a, col_b, col_c = st.columns(3)
-                col_a.metric("Impact", rec['impact'], impact_color[rec['impact']])
-                col_b.metric("Effort", rec['effort'])
-                col_c.metric("Priorité", f"#{rec['priority']}")
-                
-                st.progress(min(100, rec['priority'] * 20))
+                col_a, col_b = st.columns(2)
+                col_a.metric("Impact", rec['impact'])
+                col_b.metric("Priorité", f"#{rec['priority']}")
     
     with col2:
-        st.markdown("### 🔧 Filtres personnalisés")
+        st.markdown("### 🔧 Filtres")
         
         note_min = st.slider("Note minimale ⭐", 1.0, 5.0, 2.0, 0.5)
         temps_max = st.slider("Temps max (min) ⏱️", 15, 180, 60, 15)
         
-        st.markdown("---")
-        
-        categorie = st.multiselect(
-            "Catégories 🍽️",
-            ["Entrées", "Plats", "Desserts", "Boissons"],
-            default=["Plats"]
-        )
-        
-        difficulte = st.multiselect(
-            "Difficulté 📊",
-            ["Facile", "Moyen", "Difficile"],
-            default=["Facile", "Moyen"]
-        )
-        
-        st.markdown("---")
+        categorie = st.multiselect("Catégories 🍽️", ["Entrées", "Plats", "Desserts"], default=["Plats"])
         
         if st.button("🔍 Appliquer les filtres", use_container_width=True):
-            st.success("✅ Filtres appliqués avec succès!")
-            
+            st.success("✅ Filtres appliqués!")
+        
         if st.button("🔄 Réinitialiser", use_container_width=True):
             st.info("ℹ️ Filtres réinitialisés")
+
+# ============================================================================
+# LANCER L'APPLICATION
+# ============================================================================
 
 if __name__ == "__main__":
     main()
