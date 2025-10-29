@@ -8,14 +8,13 @@ Mes visualisations univariées / bivariées pour la table `interactions`.
 from __future__ import annotations
 
 import ast
-from typing import Optional, Sequence, Tuple
+from typing import Optional, Sequence, Tuple, List
+from collections import Counter
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from typing import Optional, List, Tuple
-from collections import Counter
 
 # Ma palette fixe (Jaune, Bleu, Rouge, Vert, Violet, Gris)
 PALETTE: Tuple[str, ...] = (
@@ -44,6 +43,7 @@ def _finalize(fig: plt.Figure, show: bool, return_fig: bool):
     - si show=True : j’affiche puis je ferme, et je ne retourne rien.
     - si return_fig=True : je ne montre pas, je ne ferme pas, et je retourne la figure.
     - sinon : je ferme et je ne retourne rien.
+    (Patch Streamlit: si return_fig=True on NE ferme PAS, pas de plt.show()).
     """
     if return_fig:
         return fig
@@ -227,11 +227,9 @@ def activity_bucket_bar(
     df["rating"] = pd.to_numeric(df["rating"], errors="coerce")
     df = df.dropna(subset=["rating"])
 
-    # Nombre d’interactions par utilisateur (value_counts mappé)
     counts = df["user_id"].value_counts()
     df["n_interactions_user"] = df["user_id"].map(counts)
 
-    # Catégorisation selon [0, 1, 10, 60, +∞[
     full_bins = [*bins, float("inf")]
     df["interaction_level"] = pd.cut(
         df["n_interactions_user"],
@@ -241,7 +239,6 @@ def activity_bucket_bar(
         ordered=True,
     )
 
-    # Moyenne des notes par utilisateur + catégorie
     user_stats = (
         df.groupby("user_id", observed=True)
         .agg(
@@ -257,7 +254,7 @@ def activity_bucket_bar(
         x="interaction_level",
         y="note_moyenne",
         order=list(labels),
-        color=PALETTE[1],  # bleu
+        color=PALETTE[1],
         ax=ax,
         estimator=np.mean,
     )
@@ -294,7 +291,6 @@ def get_most_negative_user(interactions: pd.DataFrame) -> int:
         .reindex([1, 2, 3, 4, 5], fill_value=0)
     )
 
-    # Compte des avis par note
     review_counts = {
         "user_id": most_negative_user_id,
         "rating_counts": rating_counts.to_dict(),
@@ -304,65 +300,61 @@ def get_most_negative_user(interactions: pd.DataFrame) -> int:
 
 
 ## Anlyse des contributeurs
-def analyze_contributors(df_pp_raw_recipes: pd.DataFrame) -> Tuple[int, int]:
+def analyze_contributors(
+    df_pp_raw_recipes: pd.DataFrame,
+    show: bool = False,
+    return_fig: bool = False,
+) -> Optional[plt.Figure]:
     """Analyse des contributeurs dans le dataset des recettes nettoyées.
 
     Args:
         df_pp_raw_recipes (pd.DataFrame): DataFrame des recettes nettoyées.
+        show (bool): Afficher directement (Jupyter).
+        return_fig (bool): Retourner la figure (Streamlit).
 
     Returns:
-        Tuple[int, int]: Nombre total de recettes et nombre unique de contributeurs.
+        Optional[plt.Figure]: Figure si return_fig=True.
     """
+    _need_cols(df_pp_raw_recipes, ["contributor_id"])
     total_recipes = len(df_pp_raw_recipes)
     unique_contributors = df_pp_raw_recipes["contributor_id"].nunique()
 
     contributor_counts = df_pp_raw_recipes["contributor_id"].value_counts()
 
-    # Visualisation
-    plt.figure(figsize=(12, 8))
+    fig, axs = plt.subplots(2, 2, figsize=(12, 8))
 
-    # Histogramme des contributions (limité pour la lisibilité)
-    plt.subplot(2, 2, 1)
     contributor_counts_limited = contributor_counts[contributor_counts <= 20]
-    plt.hist(contributor_counts_limited, bins=20, alpha=0.7)
-    plt.xlabel("Nombre de recettes par contributeur")
-    plt.ylabel("Nombre de contributeurs")
-    plt.title("Distribution des contributions (≤20 recettes)")
+    axs[0, 0].hist(contributor_counts_limited, bins=20, alpha=0.7)
+    axs[0, 0].set_xlabel("Nombre de recettes par contributeur")
+    axs[0, 0].set_ylabel("Nombre de contributeurs")
+    axs[0, 0].set_title("Distribution des contributions (≤20 recettes)")
 
-    # Boxplot
-    plt.subplot(2, 2, 2)
-    plt.boxplot(contributor_counts)
-    plt.ylabel("Nombre de recettes")
-    plt.title("Boxplot des contributions")
+    axs[0, 1].boxplot(contributor_counts)
+    axs[0, 1].set_ylabel("Nombre de recettes")
+    axs[0, 1].set_title("Boxplot des contributions")
 
-    # Top 20 contributeurs
-    plt.subplot(2, 2, 3)
     top_20 = contributor_counts.head(20)
-    plt.bar(range(1, len(top_20) + 1), top_20.values)
-    plt.xlabel("Rang du contributeur")
-    plt.ylabel("Nombre de recettes")
-    plt.title("Top 20 contributeurs")
-    plt.xticks(range(1, len(top_20) + 2, 2))
+    axs[1, 0].bar(range(1, len(top_20) + 1), top_20.values)
+    axs[1, 0].set_xlabel("Rang du contributeur")
+    axs[1, 0].set_ylabel("Nombre de recettes")
+    axs[1, 0].set_title("Top 20 contributeurs")
+    axs[1, 0].set_xticks(range(1, len(top_20) + 2, 2))
 
-    # Courbe cumulative
-    plt.subplot(2, 2, 4)
     cumsum_recipes = contributor_counts.sort_values(ascending=False).cumsum()
-    plt.plot(
+    axs[1, 1].plot(
         range(1, len(cumsum_recipes) + 1), cumsum_recipes.values / total_recipes * 100
     )
-    plt.xlabel("Nombre de contributeurs")
-    plt.ylabel("% cumulé des recettes")
-    plt.title("Concentration des contributions")
-    plt.grid(True)
+    axs[1, 1].set_xlabel("Nombre de contributeurs")
+    axs[1, 1].set_ylabel("% cumulé des recettes")
+    axs[1, 1].set_title("Concentration des contributions")
+    axs[1, 1].grid(True)
 
-    plt.tight_layout()
-    plt.show()
+    fig.tight_layout()
 
-    # Analyse de concentration (principe de Pareto)
-    top_20_percent = int(unique_contributors * 0.2)
-    recipes_by_top_20_percent = contributor_counts.head(top_20_percent).sum()
+    # (Ancien code calcul concentration conservé si besoin futur)
+    _ = unique_contributors  # placeholders pour éviter avertissements
 
-    return _finalize(plt.gcf(), show=False, return_fig=False)
+    return _finalize(fig, show, return_fig)
 
 
 # statistique descriptive pour les variables non catégorielles
@@ -428,7 +420,6 @@ def plot_prep_time_distribution(
         Optional[plt.Figure]: La figure matplotlib si return_fig est True, sinon None.
     """
 
-    # catégorisation des temps de préparation
     df_temp = df.copy()
     df_temp["time_category"] = df_temp["minutes"].apply(categorize_cooking_time)
     time_distribution = df_temp["time_category"].value_counts()
@@ -465,11 +456,9 @@ def analyze_ingredients_vectorized(df: pd.DataFrame) -> pd.DataFrame:
 
     results = df["ingredients"].apply(parse_and_count)
 
-    # Séparer les longueurs et les listes
     lengths = pd.Series([r[0] for r in results])
     ingredients_lists = [r[1] for r in results]
 
-    # Aplatir toutes les listes en une seule fois
     all_ingredients = [item for sublist in ingredients_lists for item in sublist]
 
     ingredient_counts = Counter(all_ingredients)
@@ -517,20 +506,18 @@ def plot_ingredient(
     list_ingredient = list_ingredients(df)
     ingredient_counts = Counter(list_ingredient)
 
-    # récupérer le rang de l'ingrédient le plus utilisé pour atteindre 80% des utilisations
     total_uses = sum(ingredient_counts.values())
     cumulative_uses = 0
     sorted_ingredients = ingredient_counts.most_common()
     rank_80_percent = 0
 
-    for rank, (ingredient, count) in enumerate(sorted_ingredients, start=1):
+    for rank, (_, count) in enumerate(sorted_ingredients, start=1):
         cumulative_uses += count
         if cumulative_uses / total_uses >= 0.8:
             rank_80_percent = rank
             break
 
     fig, axes = plt.subplots(1, 2, figsize=(18, 10))
-    # Distribution du nombre d'ingrédients par recette
     axes[0].hist(
         ingredients_per_recipe, bins=30, alpha=0.7, color="lightblue", edgecolor="black"
     )
@@ -545,12 +532,9 @@ def plot_ingredient(
     )
     axes[0].legend()
 
-    # Courbe de Pareto (fréquence cumulative)
-
     frequencies_all = list(ingredient_counts.values())
     sorted_frequencies = sorted(frequencies_all, reverse=True)
     cumulative_percent = np.cumsum(sorted_frequencies) / sum(sorted_frequencies) * 100
-    plt.subplot(1, 2, 2)
     axes[1].plot(range(1, len(cumulative_percent) + 1), cumulative_percent)
     axes[1].set_title("Courbe de Pareto - Concentration des ingrédients")
     axes[1].set_xlabel("Rang de l'ingrédient")
@@ -566,9 +550,7 @@ def plot_ingredient(
     axes[1].axhline(80, color="red", linestyle="--", alpha=0.7, label="80%")
     axes[1].legend()
 
-    plt.tight_layout()
-    plt.show()
-
+    fig.tight_layout()
     return _finalize(fig, show, return_fig)
 
 
@@ -607,10 +589,8 @@ def plot_n_steps_distribution(
     df_temp["complexity_category"] = df_temp["n_steps"].apply(categorize_steps)
     complexity_distribution = df_temp["complexity_category"].value_counts()
 
-    # 3. Visualisations
     fig, axes = plt.subplots(2, 2, figsize=(18, 12))
 
-    # Histogramme simple
     axes[0, 0].hist(
         df["n_steps"], bins=30, alpha=0.7, color="skyblue", edgecolor="black"
     )
@@ -632,7 +612,6 @@ def plot_n_steps_distribution(
     axes[0, 0].legend()
     axes[0, 0].grid(True, alpha=0.3)
 
-    # Distribution par catégories (graphique en barres)
     complexity_order = [
         "Très simple (≤3 étapes)",
         "Simple (4-6 étapes)",
@@ -648,7 +627,6 @@ def plot_n_steps_distribution(
     axes[1, 0].set_ylabel("Nombre de recettes")
     axes[1, 0].tick_params(axis="x", rotation=45)
 
-    # Distribution cumulative
     sorted_steps = np.sort(df["n_steps"])
     cumulative_prob = np.arange(1, len(sorted_steps) + 1) / len(sorted_steps)
     axes[0, 1].plot(sorted_steps, cumulative_prob, linewidth=2)
@@ -657,7 +635,6 @@ def plot_n_steps_distribution(
     axes[0, 1].set_ylabel("Probabilité cumulative")
     axes[0, 1].grid(True, alpha=0.3)
 
-    # Pychart
     colors = ["#ff9999", "#66b3ff", "#99ff99", "#ffcc99", "#ff99cc", "#c2c2f0"]
     axes[1, 1].pie(
         complexity_ordered.values,
@@ -668,9 +645,7 @@ def plot_n_steps_distribution(
     )
     axes[1, 1].set_title("Répartition par complexité")
 
-    plt.tight_layout()
-    plt.show()
-
+    fig.tight_layout()
     return _finalize(fig, show, return_fig)
 
 
@@ -684,8 +659,6 @@ def analyse_tags(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame: DataFrame contenant les statistiques sur les tags.
     """
-    # Nombre de tags par recette
-
     l_tags = list(df.tags)
     list_tags = []
     for item in l_tags:
@@ -723,11 +696,9 @@ def analyse_tags(df: pd.DataFrame) -> pd.DataFrame:
                 frequency_distribution.get("Très commun (>1000)", 0) + 1
             )
 
-    # pour chaque distribution de fréquence, récupérer le taux de fréquence puis ajouter dans les stats
     percent_frequency = {
         k: v / len(tag_counts.values()) * 100 for k, v in frequency_distribution.items()
     }
-    # Statistiques descriptives
     stats = {
         "Nb_uniques_tags": len(set(list_tags)),
         "Nb_tags_les_plus_utilises": most_common_tags,
@@ -788,8 +759,6 @@ def plot_tags_distribution(
 
 
 ### fonction permettant d'afficher la distribution des calories, du sucre et des protéines, saturated fat, total fat, carbohydrates et sodium
-
-
 def plot_nutrition_distribution(
     df: pd.DataFrame, show: bool = False, return_fig: bool = False
 ) -> Optional[plt.Figure]:
@@ -821,11 +790,12 @@ def plot_nutrition_distribution(
     sns.histplot(df["total_fat"], bins=20, kde=False, ax=axes[1, 1], color="purple")
     axes[1, 1].set_title("Distribution des graisses totales")
     axes[1, 1].set_xlabel("Graisses totales (g)")
-    sns.histplot(df["carbohydrates"], bins=20, kde=False, ax=axes[1, 2], color="brown")
+    sns.histplot(
+        df["carbohydrates"], bins=20, kde=False, ax=axes[1, 2], color="brown"
+    )
     axes[1, 2].set_title("Distribution des carbohydrates")
     axes[1, 2].set_xlabel("Carbohydrates (g)")
-    plt.tight_layout()
-    plt.show()
+    fig.tight_layout()
 
     return _finalize(fig, show, return_fig)
 
@@ -852,7 +822,6 @@ def minutes_group_negative_reviews_bar(
 
     _need_cols(merged_df, [minutes_col, y_col])
 
-    # Fonction interne pour catégoriser les temps de préparation
     def _regroup_time(m):
         if pd.isna(m):
             return "Invalide"
@@ -866,7 +835,6 @@ def minutes_group_negative_reviews_bar(
         else:
             return "Longue (>180 min)"
 
-    # Conversion des valeurs et suppression des entrées invalides
     df = merged_df[[minutes_col, y_col]].copy()
     df[minutes_col] = pd.to_numeric(df[minutes_col], errors="coerce")
     df[y_col] = pd.to_numeric(df[y_col], errors="coerce")
@@ -874,10 +842,8 @@ def minutes_group_negative_reviews_bar(
     df["time_group"] = df[minutes_col].apply(_regroup_time)
     df = df[(df["time_group"] != "Invalide") & df[y_col].notna()]
 
-    # Ordre cohérent pour les catégories
     order = ["Courte (≤30 min)", "Moyenne (31–180 min)", "Longue (>180 min)"]
 
-    # Création du graphique
     fig, ax = plt.subplots(1, 2, figsize=(14, 8))
     sns.barplot(
         data=df,
@@ -890,8 +856,6 @@ def minutes_group_negative_reviews_bar(
         palette="crest",
         ax=ax[0],
     )
-
-    # Mise en forme du graphique
     ax[0].set_title(
         "Score moyen d’insatisfaction selon la durée de préparation", fontsize=13
     )
@@ -900,7 +864,7 @@ def minutes_group_negative_reviews_bar(
     ax[0].grid(axis="y", alpha=0.25)
 
     sns.regplot(
-        data=df[df["minutes"] < 1000],  # on exclut les durées extrêmes
+        data=df[df["minutes"] < 1000],
         x="minutes",
         y=y_col,
         scatter_kws={"alpha": 0.3, "s": 10},
@@ -929,9 +893,7 @@ def spearman_correlation(df: pd.DataFrame, col1: str, col2: str) -> float:
     Returns:
         corr (float): Coefficient de corrélation.
     """
-
     corr = df[col1].corr(df[col2], method="spearman")
-
     return corr
 
 
@@ -952,12 +914,9 @@ def plot_ingredients_vs_negative_score(
     sns.scatterplot(
         data=merged_df, x="n_ingredients", y="negative_reviews", alpha=0.3, s=10
     )
-
     plt.title("Relation entre le nombre d’ingrédients et le score d’insatisfaction")
     plt.xlabel("Nombre d’ingrédients")
     plt.ylabel("Score d’insatisfaction")
-    plt.show()
-
     return _finalize(fig, show, return_fig)
 
 
@@ -975,7 +934,6 @@ def analyze_tags_correlation(
         Optional[plt.Figure]: La figure matplotlib si return_fig est True, sinon None.
     """
 
-    # Conversion sécurisée des chaînes en listes
     def safe_eval(x):
         if isinstance(x, list):
             return x
@@ -986,9 +944,9 @@ def analyze_tags_correlation(
                 return []
         return []
 
+    merged_df = merged_df.copy()
     merged_df["tags"] = merged_df["tags"].apply(safe_eval)
 
-    # Compter les tags les plus fréquents (en ignorant les NaN et erreurs)
     tag_counts = Counter(
         tag for tags in merged_df["tags"] if isinstance(tags, list) for tag in tags
     )
@@ -999,7 +957,7 @@ def analyze_tags_correlation(
     merged_df["negative_score"] = merged_df["negative_reviews"] * np.log1p(
         merged_df["total_reviews"]
     )
-    # On calcule le score moyen et le nombre de recettes par tag
+
     for tag in top_tags:
         subset = merged_df[
             merged_df["tags"].apply(lambda tags: isinstance(tags, list) and tag in tags)
@@ -1008,16 +966,10 @@ def analyze_tags_correlation(
         count = len(subset)
         tag_sentiment.append((tag, mean_score, count))
 
-    # Création d'un DataFrame propre
     tag_df = pd.DataFrame(
         tag_sentiment, columns=["tag", "mean_negative_score", "count"]
-    )
-    tag_df = tag_df.sort_values("mean_negative_score", ascending=False)
-
-    # Calcul fréquence + score moyen
+    ).sort_values("mean_negative_score", ascending=False)
     tag_df["popularity"] = tag_df["count"]
-
-    # Fusion avec ceux les plus critiqués
     combined = tag_df.copy()
 
     fig, ax = plt.subplots(2, 1, figsize=(12, 12))
@@ -1034,6 +986,7 @@ def analyze_tags_correlation(
     ax[0].set_xlabel("Score moyen d’insatisfaction")
     ax[0].set_ylabel("Tag (type de recette)")
     ax[0].grid(axis="x", alpha=0.25)
+    ax[0].legend([], [], frameon=False)
 
     sns.scatterplot(
         data=combined,
@@ -1046,7 +999,6 @@ def analyze_tags_correlation(
         alpha=0.7,
         ax=ax[1],
     )
-
     ax[1].set_title(
         "Relation entre la popularité des tags et leur score d’insatisfaction"
     )
@@ -1054,8 +1006,8 @@ def analyze_tags_correlation(
     ax[1].set_ylabel("Score moyen d’insatisfaction")
     ax[1].set_xscale("log")
     ax[1].legend([], [], frameon=False)
+
     fig.tight_layout()
-    plt.show()
     return _finalize(fig, show, return_fig)
 
 
@@ -1082,6 +1034,7 @@ def nutrition_correlation_analysis(
         "carbohydrates",
     ]
 
+    merged_df = merged_df.copy()
     merged_df["negative_score"] = merged_df["negative_reviews"] * np.log1p(
         merged_df["total_reviews"]
     )
@@ -1096,7 +1049,6 @@ def nutrition_correlation_analysis(
     plt.title(
         "Corrélation entre les variables nutritionnelles et le score d’insatisfaction"
     )
-    plt.tight_layout()
-    plt.show()
+    fig.tight_layout()
 
     return _finalize(fig, show, return_fig)
