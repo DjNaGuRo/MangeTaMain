@@ -71,13 +71,14 @@ def _read_csv(rel):
         return None
 
 def load_recipes_data():
-    return _read_csv("data/processed/merged_cleaned.csv")
+    return _read_csv("src/data/processed/merged_cleaned.csv")
 
 def load_interactions_data():
-    return _read_csv("data/processed/interactions_cleaned.csv")
+    return _read_csv("src/data/processed/interactions_cleaned.csv")
 
 def load_clean_recipes_data():
-    return _read_csv("data/processed/recipes_cleaned.csv")
+    return _read_csv("src/data/processed/recipes_cleaned.csv")
+
 
 # ---------------------------------------------------------------------------
 # Thème
