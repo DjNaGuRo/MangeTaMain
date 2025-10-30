@@ -38,4 +38,5 @@ MangeTaMain/tests/__pycache__/*
 *.pkl
 /notebooks/subdir/nltk_data/*
 src/*pycache*
+*.coverage
 >>>>>>> main

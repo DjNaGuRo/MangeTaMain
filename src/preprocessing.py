@@ -2,6 +2,17 @@ import pandas as pd
 from pathlib import Path
 import json
 import re
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+try:
+    from src.data_visualization import _finalize
+except Exception:
+
+    def _finalize(fig, show=False, return_fig=False):
+        if show:
+            plt.show()
+        return fig if return_fig else None
 
 
 # Detection des valeurs manquantes

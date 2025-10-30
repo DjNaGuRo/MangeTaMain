@@ -1,0 +1,8 @@
+rating_distribution: |
+  Analyse: forte concentration des notes sur 4–5 → biais positif.
+recipe_mean_rating_distribution: |
+  Les recettes très mal notées sont rares; distribution resserrée haut de l’échelle.
+analyze_tags_correlation: |
+  Tags equipment / meat / main-dish montrent un score d’insatisfaction plus élevé.
+user_mean_rating_distribution: |
+  Nous pouvons visualiser la répartition des notes que les utilisateurs du site ont attribués. On peut constater un fort déséquilibre. 
