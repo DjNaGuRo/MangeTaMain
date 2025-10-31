@@ -10,8 +10,15 @@ __author__ = "Votre Nom"
 from . import data_loader
 from . import preprocessing
 from . import data_visualization
+
 # Optionnel: exposer les fonctions les plus utilisées
-from .data_loader import load_interactions_data, load_recipes_data,load_clean_recipes,load_clean_interactions, load_clean_merged
+from .data_loader import (
+    load_interactions_data,
+    load_recipes_data,
+    load_clean_recipes,
+    load_clean_interactions,
+    load_clean_merged,
+)
 from .preprocessing import detect_missing_values
 
 

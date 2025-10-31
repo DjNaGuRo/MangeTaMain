@@ -38,3 +38,8 @@ MangeTaMain/tests/__pycache__/
 /notebooks/subdir/nltk_data/*
 src/*pycache*
 *.coverage
+
+# Documentation build
+docs/_build/
+docs/_static/
+docs/_templates/

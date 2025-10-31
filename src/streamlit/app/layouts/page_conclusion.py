@@ -1,7 +1,9 @@
 import streamlit as st
 
+
 def show_conclusion_page():
-    st.markdown("""Nous avons effectué une analyse entre la variable a expliquer "niveau d'insatisfaction des recettes" et les variables explicatives comme le temps de préparation ou les valeurs nutritionnelles. 
+    st.markdown(
+        """Nous avons effectué une analyse entre la variable a expliquer "niveau d'insatisfaction des recettes" et les variables explicatives comme le temps de préparation ou les valeurs nutritionnelles. 
                 Nous avons remarqué qu'il n'y a pas de forte corrélation. 
                 Nous pouvons donc penser que les variables seules ne suffisent pas pour expliquer le niveau d'insatisfactions des utilisateurs. 
 
@@ -11,5 +13,5 @@ def show_conclusion_page():
 c'est à dire développer des modèles de machine learning pour capturer les interactions complexes entre les variables. 
 Faire du clustering afin de regrouper des modèles selon certaines caractéristiques combinés et étudier le taux d'insatisfaction
 
--   On peut créer par exemple une nouvelle variable "complexité" avec "minutes / n_steps" décrivant la compléxité d'une recette.""")
-    
+-   On peut créer par exemple une nouvelle variable "complexité" avec "minutes / n_steps" décrivant la compléxité d'une recette."""
+    )

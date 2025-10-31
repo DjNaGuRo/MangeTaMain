@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import yaml
 
+
 # ---------------------------------------------------------------------------
 # Setup chemin src
 # ---------------------------------------------------------------------------
@@ -24,6 +25,7 @@ def _ensure_src_on_path():
 
 
 PROJECT_ROOT = _ensure_src_on_path()
+
 
 # ---------------------------------------------------------------------------
 # Chargement des données (cache)
@@ -58,6 +60,7 @@ def load_all_datasets():
         "raw_interactions": raw_interactions,
     }
 
+
 # --- Chargement commentaires externes (YAML) ---
 @st.cache_data
 def load_commentary_yaml():
@@ -68,6 +71,7 @@ def load_commentary_yaml():
         return yaml.safe_load(p.read_text(encoding="utf-8")) or {}
     except Exception:
         return {}
+
 
 # ---------------------------------------------------------------------------
 # Textes explicatifs (extraits / synthèses notebook)
@@ -122,6 +126,7 @@ MD_MAP = {
 
 EXTERNAL_COMMENTS = load_commentary_yaml()
 
+
 def get_comment(func_name: str) -> str:
     # Priorité YAML puis MD_MAP
     return EXTERNAL_COMMENTS.get(func_name) or MD_MAP.get(func_name)
@@ -132,6 +137,7 @@ def get_ds():
     if "ds" not in st.session_state:
         st.session_state["ds"] = load_all_datasets()
     return st.session_state["ds"]
+
 
 # ---------------------------------------------------------------------------
 # Wrapper rendu (affiche figure + docstring + texte explicatif)
@@ -174,6 +180,7 @@ def render_viz(
                 st.caption("FAST_MODE actif (échantillonnage).")
         except Exception as e:
             st.error(f"Erreur: {e}")
+
 
 def _safe_rerun():
     """Compatibilité versions Streamlit."""

@@ -2,6 +2,7 @@ import streamlit as st
 from pathlib import Path
 import sys
 
+
 # ---------------------------------------------------------------------------
 # Setup chemin src
 # ---------------------------------------------------------------------------
@@ -62,7 +63,8 @@ except Exception as e:
     DV_OK = False
     DV_ERR = e
 
-from src.streamlit.app.utils  import get_ds, render_viz, _safe_rerun
+from src.streamlit.app.utils import get_ds, render_viz, _safe_rerun
+
 
 # ---------------------------------------------------------------------------
 # Page Visualisations
@@ -81,13 +83,12 @@ def show_visualizations():
     with tabs[0]:
         render_viz("Distribution brute des notes", rating_distribution, df_inter)
 
-         # imputation
+        # imputation
         st.markdown(
-        """L’analyse univariée de la variable rating met en évidence une forte concentration des évaluations sur les valeurs hautes de l’échelle (4 et 5).
+            """L’analyse univariée de la variable rating met en évidence une forte concentration des évaluations sur les valeurs hautes de l’échelle (4 et 5).
             Ce biais positif traduit une satisfaction générale élevée sur la plateforme, mais il indique aussi que la variable rating n’est pas symétriquement distribuée."""
-    )
+        )
 
-        
         render_viz(
             "Analyse des contributeurs des recettes",
             analyze_contributors,
@@ -95,10 +96,10 @@ def show_visualizations():
         )
 
         st.markdown(
-    """Parmi tous les contributeurs, plus de la moitié ont posté 1 seule recette. 
+            """Parmi tous les contributeurs, plus de la moitié ont posté 1 seule recette. 
     Le contributeur le plus actif a posté à lui seul quasiment 3000 recette. 
     Nous pouvons aussi observer que plus de 50% des recettes sont produits par le top 500 des contributeurs parmi les 27523 contributeurs"""
-)
+        )
 
     with tabs[1]:
         render_viz("Top utilisateurs actifs", top_users_by_activity, df_inter)
@@ -109,16 +110,19 @@ def show_visualizations():
             df_inter,
             sample=2500,
         )
-        
-        st.markdown("""Ce graphique représente la note moyenne des utilisateurs par rapport au nombre d'avis laissé. Nous pouvons faire 2 interprétations remarquable : 
+
+        st.markdown(
+            """Ce graphique représente la note moyenne des utilisateurs par rapport au nombre d'avis laissé. Nous pouvons faire 2 interprétations remarquable : 
                     premièrement, au cas par cas, la plupart des utilisateurs laisse très peu d'avis (car forte concentration proche de 0). 
-                    Deuxièment, nous pouvons voir que les utilisateurs ayant donné le plus d'avis ont une moyenne de note de 4,5 ~ 5, par exemple pour l'utilisateur qui a donné le plus d'avis a une moyenne des notes très proche de 5 ! """)
+                    Deuxièment, nous pouvons voir que les utilisateurs ayant donné le plus d'avis ont une moyenne de note de 4,5 ~ 5, par exemple pour l'utilisateur qui a donné le plus d'avis a une moyenne des notes très proche de 5 ! """
+        )
 
     with tabs[2]:
         render_viz(
             "Temps de préparation (catégories)", plot_prep_time_distribution, df_merged
         )
-        st.markdown("""La variable minute présente une forte asymétrie à droite. La majorité des recettes ont un temps de préparation assez court mais certaines recettes très longues tirent la moyenne vers le haut.
+        st.markdown(
+            """La variable minute présente une forte asymétrie à droite. La majorité des recettes ont un temps de préparation assez court mais certaines recettes très longues tirent la moyenne vers le haut.
 On peut également observer une dispersion très importante (Variance = 321234.9). 
 
 Nous pouvons prendre en note 2 valeurs particulières :
@@ -126,8 +130,10 @@ Nous pouvons prendre en note 2 valeurs particulières :
 Cependant nous supposons que un temps de 0 correspond à un oubli et que cette valeur ne devrait pas influencer notre étude sur le taux d'insatisfaction des recettes
 -   Certaine recette présente un temps de préparation de 43200 minutes, correspondant à un mois de préparation. 
 Ce temps de préparation prend probablement en compte certains facteurs tel que la maturation d'un ingrédient. 
-Nous décidons aussi de le garder dans notre jeu de donnée d'autant plus que ce temps de préparation long pourrait être facteur d'insatisfaction""")
-        st.markdown("""Sur ce graphique nous avons catégorisé les temps de préparation : 
+Nous décidons aussi de le garder dans notre jeu de donnée d'autant plus que ce temps de préparation long pourrait être facteur d'insatisfaction"""
+        )
+        st.markdown(
+            """Sur ce graphique nous avons catégorisé les temps de préparation : 
 - Très rapide : $ \leq 15 $ min
 - Rapide      : 16 ~ 30 min
 - Moyen       : 31 ~ 60 min
@@ -138,16 +144,19 @@ Nous décidons aussi de le garder dans notre jeu de donnée d'autant plus que ce
 Nous observons que la plupart des recettes prennent au plus 2 heures de prépartations. 
 à noté que les recettes avec 0 min de temps de préparation sont aussi inclus dans la catégorie "très rapide", 
 cependant en faisant le calcul ci-dessous nous pouvons voir que ces recettes représentent une très petite partie (0.43%). 
-Cela n'influence donc pas la distribution entière, nous pouvons donc affirmer que la plupart des recettes prennent bien au plus 2 heures de préparations""")
-        
+Cela n'influence donc pas la distribution entière, nous pouvons donc affirmer que la plupart des recettes prennent bien au plus 2 heures de préparations"""
+        )
+
         render_viz(
             "Ingrédients + Pareto",
             plot_ingredient,
             df_clean_recipes if df_clean_recipes is not None else df_merged,
         )
-        
-        st.markdown(""""Les 618 ingrédients les plus utilisés dans les recettes représentent 80% des ingrédients les plus utilisés""")
-        
+
+        st.markdown(
+            """"Les 618 ingrédients les plus utilisés dans les recettes représentent 80% des ingrédients les plus utilisés"""
+        )
+
         render_viz("Nombre d'étapes", plot_n_steps_distribution, df_merged)
         if df_merged is not None and "tags" in df_merged.columns:
             render_viz("Distribution des tags", plot_tags_distribution, df_merged)
@@ -172,15 +181,17 @@ Cela n'influence donc pas la distribution entière, nous pouvons donc affirmer q
                     plot_ingredients_vs_negative_score,
                     df_merged,
                 )
-                
-                st.markdown("""Les analyses menées sur la durée de préparation et le nombre d’ingrédients montrent qu’il n’existe pas de relation significative entre ces variables et le score d’insatisfaction des utilisateurs.
+
+                st.markdown(
+                    """Les analyses menées sur la durée de préparation et le nombre d’ingrédients montrent qu’il n’existe pas de relation significative entre ces variables et le score d’insatisfaction des utilisateurs.
 Autrement dit, une recette longue ou complexe n’est pas forcément plus critiquée qu’une recette simple ou rapide. 
 Ces résultats suggèrent que les facteurs techniques — tels que le temps nécessaire ou la complexité de la recette — ne sont pas les principaux déterminants de la satisfaction.
 Les utilisateurs semblent plutôt juger les recettes selon des critères qualitatifs (goût, type de plat, attentes personnelles, ou présentation) plutôt que sur la durée ou la difficulté.
 Ainsi, le niveau d’insatisfaction ne dépend pas directement de l’effort ou du temps investi, mais davantage de l’expérience gustative perçue ou de la catégorie culinaire.
 
-En conclusion, il devient pertinent de poursuivre l’étude en se concentrant sur le type de recette (tags) afin d’identifier quelles catégories de plats (desserts, plats principaux, boissons, etc.) sont les plus sujettes aux critiques.""")
-                
+En conclusion, il devient pertinent de poursuivre l’étude en se concentrant sur le type de recette (tags) afin d’identifier quelles catégories de plats (desserts, plats principaux, boissons, etc.) sont les plus sujettes aux critiques."""
+                )
+
             if "tags" in df_merged.columns and {
                 "negative_reviews",
                 "total_reviews",
@@ -189,7 +200,8 @@ En conclusion, il devient pertinent de poursuivre l’étude en se concentrant s
                     "Tags vs insatisfaction", analyze_tags_correlation, df_merged
                 )
 
-                st.markdown("""Le graphique montre les 10 catégories de recettes (tags) présentant les scores moyens d’insatisfaction les plus élevés.
+                st.markdown(
+                    """Le graphique montre les 10 catégories de recettes (tags) présentant les scores moyens d’insatisfaction les plus élevés.
 
 Les tags comme “equipment”, “meat”, “number-of-servings” ou “main-dish” apparaissent en tête, indiquant que les recettes associées à ces catégories sont plus souvent critiquées par les utilisateurs.
 
@@ -209,7 +221,8 @@ On observe que certains tags très fréquents (comme dietary, main-dish) ont un 
 
 En revanche, equipment est peu fréquent mais très critiqué (score proche de 2.8).
 
-Cela signifie que la popularité n’est pas forcément liée à la satisfaction : un tag peut être très commun et pourtant globalement apprécié, ou rare mais très mal noté.""")
+Cela signifie que la popularité n’est pas forcément liée à la satisfaction : un tag peut être très commun et pourtant globalement apprécié, ou rare mais très mal noté."""
+                )
 
     with tabs[4]:
         needed = {
@@ -230,5 +243,7 @@ Cela signifie que la popularité n’est pas forcément liée à la satisfaction
                 df_merged,
             )
 
-        st.markdown("""Les caractéristiques nutritionnelles (calories, sucres, graisses, protéines, etc.) n’ont pas d’influence directe sur la perception ou la satisfaction des utilisateurs.
-Que la recette soit grasse, sucrée ou salée, cela n’affecte ni le nombre d’avis négatifs, ni le score global d’insatisfaction.""")
+        st.markdown(
+            """Les caractéristiques nutritionnelles (calories, sucres, graisses, protéines, etc.) n’ont pas d’influence directe sur la perception ou la satisfaction des utilisateurs.
+Que la recette soit grasse, sucrée ou salée, cela n’affecte ni le nombre d’avis négatifs, ni le score global d’insatisfaction."""
+        )

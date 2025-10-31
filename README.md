@@ -1,127 +1,246 @@
 # MangeTaMain - Analyse Exploratoire de Données de Recettes
 
-Ce projet contient une analyse exploratoire de données (EDA) sur un dataset de recettes et d'avis provenant de Food.com.
+Ce projet contient une analyse exploratoire de données (EDA) sur un dataset de recettes et d'avis provenant de Food.com, développé par une équipe de 5 étudiants : Guy, Mohamed, Leonnel, Omar et Osman.
 
-## Structure du Projet
+## 🎯 Objectif du Projet
+
+L'objectif principal est d'identifier les caractéristiques communes aux **recettes les moins appréciées** par les utilisateurs d'une plateforme culinaire. En analysant les interactions des utilisateurs (notes, avis) et les informations descriptives des recettes, nous cherchons à :
+
+- Comprendre quels facteurs influencent la satisfaction/insatisfaction des utilisateurs
+- Dresser une carte statistique des recettes les moins appréciées
+- Fournir des recommandations d'amélioration pour les concepteurs de contenu culinaire
+
+## 📊 Datasets
+
+Le projet exploite deux jeux de données principaux :
+
+### Dataset Recipes
+- Informations descriptives des recettes (nom, description, type de plat)
+- Ingrédients et temps de préparation
+- Données nutritionnelles (calories, lipides, glucides, protéines, etc.)
+- Métadonnées (portions, difficulté, tags)
+
+### Dataset Interactions
+- Notes attribuées aux recettes (1-5)
+- Commentaires et avis textuels
+- Données d'activité utilisateurs
+- Métadonnées temporelles
+
+## 🏗️ Structure du Projet
 
 ```
 MangeTaMain/
-├── src/
-│   ├── data/
-│   └── streamlit/
-├── notebooks/
-├── tests/
-├── pyproject.toml
-└── README.md
+├── src/                          # Code source principal
+│   ├── __init__.py
+│   ├── data_loader.py           # Chargement des données
+│   ├── preprocessing.py         # Nettoyage et préprocessing
+│   ├── data_visualization.py    # Fonctions de visualisation
+│   └── streamlit/               # Application Streamlit
+│       └── app/
+│           ├── streamlit_app.py # Application principale
+│           ├── layouts/         # Pages de l'interface
+│           └── utils.py         # Utilitaires Streamlit
+├── notebooks/                   # Notebooks Jupyter
+│   ├── data_cleaning.ipynb
+│   └── data_vizualisation.ipynb
+├── tests/                       # Tests unitaires
+├── data/                        # Données (non versionnées)
+│   ├── raw/                     # Données brutes
+│   └── processed/               # Données nettoyées
+├── docs/                        # Documentation Sphinx
+├── docker-compose.yml           # Configuration Docker
+├── Dockerfile                   # Image Docker
+└── pyproject.toml              # Configuration Poetry
 ```
 
-## Installation avec Poetry
+## ⚙️ Installation
 
-1. Assurez-vous d'avoir Poetry installé. Si ce n'est pas le cas :
-   ```bash
-   curl -sSL https://install.python-poetry.org | python3 -
-   ```
+### Prérequis
+- Python 3.11 ou supérieur
+- Poetry (gestionnaire de dépendances)
+- Git
 
-2. Installez les dépendances :
-   ```bash
-   poetry install
-   ```
+### Installation avec Poetry
 
-3. Activez l'environnement virtuel :
-   ```bash
-   poetry shell
-   ```
-
-## Utilisation
-
-### Lancer Jupyter Notebook
+1. **Clonez le repository :**
 ```bash
-poetry run jupyter notebook
+git clone <your-repo-url>
+cd MangeTaMain
 ```
 
-### Lancer le notebook principal
+2. **Installez Poetry si nécessaire :**
 ```bash
-poetry run jupyter notebook notebooks/lab-recipe-student.ipynb
+curl -sSL https://install.python-poetry.org | python3 -
 ```
 
-## Dépendances Principales
+3. **Installez les dépendances :**
+```bash
+poetry install
+```
+
+4. **Activez l'environnement virtuel :**
+```bash
+poetry shell
+# ou
+eval $(poetry env activate)
+```
+
+## 🚀 Utilisation
+
+### Préparation des données
+Placez les données brutes dans le répertoire `data/raw` et les données nettoyées dans `data/processed` (ces dernières peuvent être obtenues en lançant le notebook `notebooks/data_cleaning.ipynb`).
+
+### Lancement de l'application Streamlit
+
+**Option 1: Via Docker Compose**
+```bash
+docker compose up
+```
+
+**Option 2: Via Streamlit directement**
+```bash
+poetry run streamlit run src/streamlit/app/streamlit_app.py
+```
+
+L'application sera disponible sur **http://localhost:8501**
+
+### Navigation dans l'interface
+
+L'application est organisée en plusieurs pages :
+
+- 🏠 **Accueil** : Présentation du projet et aperçu des données
+- 📊 **Données cleaning** : Détection des valeurs manquantes, traitement des doublons, suppression des valeurs aberrantes
+- 📈 **Visualisations** : Distribution des ratings, analyse des contributeurs, corrélations nutritionnelles, analyse de sentiment
+- 📝 **Conclusion** : Synthèse des résultats et perspectives
+
+### Utilisation des notebooks
+
+**Notebook de nettoyage des données :**
+```bash
+poetry run jupyter notebook notebooks/data_cleaning.ipynb
+```
+
+**Notebook de visualisation :**
+```bash
+poetry run jupyter notebook notebooks/data_vizualisation.ipynb
+```
+
+## 🧪 Tests et Développement
+
+### Tests unitaires
+```bash
+poetry run pytest tests/ -v
+```
+
+### Linting et formatage
+```bash
+# Formatage avec Black
+poetry run black src/
+
+# Linting avec flake8
+poetry run flake8 src/ --max-line-length=88
+```
+
+## 📚 Documentation
+
+La documentation complète est générée avec Sphinx et disponible dans le dossier `docs/`. Pour consulter la documentation :
+
+1. **Construire la documentation :**
+```bash
+# Option 1: Utilise le script de build automatique
+./build_docs.sh
+
+# Option 2: Commande manuelle
+cd docs
+poetry run sphinx-build -b html . _build/html
+```
+
+2. **Ouvrir la documentation :**
+```bash
+# Linux/WSL
+xdg-open _build/html/index.html
+# macOS
+open _build/html/index.html
+# Windows
+start _build/html/index.html
+```
+
+### API Reference
+
+La documentation automatique inclut :
+- [`data_loader`](docs/api/data_loader.md) : Fonctions de chargement des données
+- [`preprocessing`](docs/api/preprocessing.md) : Fonctions de nettoyage et préprocessing
+- [`data_visualization`](docs/api/data_visualization.md) : Fonctions de visualisation
+- [`streamlit_app`](docs/api/streamlit_app.md) : Application Streamlit
+
+## 🔧 Dépendances Principales
 
 - **numpy** : Calculs numériques
 - **pandas** : Manipulation de données
-- **matplotlib** : Visualisations de base
-- **seaborn** : Visualisations statistiques avancées
-- **jupyter** : Environnement de notebooks
+- **matplotlib/seaborn** : Visualisations
+- **streamlit** : Interface web interactive
+- **plotly** : Visualisations interactives
+- **scipy** : Calculs statistiques avancés
 
-## Développement
+## 🛠️ Développement
 
 Les outils de développement incluent :
 - **pytest** : Tests unitaires
 - **black** : Formatage du code
 - **flake8** : Linting
-- **mypy** : Vérification de types
-## **\* Projet EDA – Analyse des Recettes les Moins Appréciées**
+- **sphinx** : Génération de documentation
 
-Objectif général
+## 📈 Méthodologie
 
-L’objectif principal de ce projet est d’identifier les caractéristiques communes aux recettes les moins appréciées par les utilisateurs d’une plateforme culinaire.
-En analysant à la fois les interactions des utilisateurs (notes, avis, likes) et les informations descriptives des recettes, le projet vise à :
+Le projet suit une approche exploratoire structurée en trois phases :
 
-Comprendre quels facteurs influencent la satisfaction ou l’insatisfaction des utilisateurs (temps de préparation, difficulté, ingrédients, etc.).
+1. **🔍 Exploration initiale** : Compréhension de la structure et qualité des données
+2. **📊 Analyse statistique** : Analyse descriptive et identification des patterns
+3. **🎯 Analyse ciblée** : Focus sur les recettes les moins appréciées et facteurs d'insatisfaction
 
-Dresser une carte statistique des recettes les moins appréciées afin d’en tirer des recommandations d’amélioration pour les concepteurs de contenu culinaire.
+## 👥 Équipe
 
-Jeux de données
+- **ABDILLAHI OMAR DJAMA**
+- **AMAR Mohamed**
+- **Bagci Osman**
+- **DJOUNANG NANA Guy Rostan**
+- **SOP Leonnel Romuald**
 
-Deux jeux de données distincts sont exploités :
+## 📄 Licence
 
-Dataset Recipes
+Ce projet est sous licence MIT - voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
-Contient les informations descriptives des recettes publiées sur la plateforme :
+MIT License
 
-Nom, description et type de plat (entrée, plat principal, dessert…)
+Copyright (c) 2024 Guy, Mohamed, Leonnel, Omar, Osman
 
-Ingrédients et temps de préparation
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-Données nutritionnelles (énergie, lipides, glucides, protéines, etc.)
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-Informations complémentaires : nombre de portions, difficulté, etc.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
-Dataset Interactions
+## 🤝 Contribution
 
-Contient les données d’activité des utilisateurs vis-à-vis des recettes :
+Pour contribuer au projet :
+1. Fork le repository
+2. Créez une branche pour votre feature (`git checkout -b feature/nouvelle-fonctionnalite`)
+3. Committez vos changements (`git commit -am 'Ajout nouvelle fonctionnalité'`)
+4. Push vers la branche (`git push origin feature/nouvelle-fonctionnalite`)
+5. Créez une Pull Request
 
-Notes attribuées aux recettes
+## 📞 Support
 
-Commentaires et avis
-
-Nombre de vues, likes, favoris
-
-Ces deux jeux de données sont corrélés par un identifiant commun de recette, permettant une analyse croisée complète.
-
-Démarche analytique
-
-Le projet suit une approche exploratoire structurée en trois grandes parties :
-
-1️ Exploration initiale
-
-Objectif : comprendre la structure et la qualité des données.
-Cette phase comprend :
-
-Aperçu général des datasets (dimensions, types de variables, premières observations)
-
-Détection des valeurs manquantes
-
-Identification des doublons et des valeurs extrêmes
-
-Correction / Nettoyage des anomalies détectées
-
-L’objectif est d’obtenir un jeu de données propre et fiable pour la suite de l’analyse.
-
-2️ Analyse statistique
-
-## Commande pour lancer Streamlit
-poetry run streamlit run src/streamlit/app/streamlit_app.py
-
-## Interface graphique
- Local URL: http://localhost:8501
-  Network URL: http://192.168.1.189:8501
+Pour toute question ou support, consultez la [documentation complète](docs/) ou contactez l'équipe de développement.

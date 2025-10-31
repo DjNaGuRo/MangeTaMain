@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib
 
-from src.preprocessing import plot_minutes_ningredients_nsteps
+from src.data_visualization import plot_minutes_ningredients_nsteps
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -71,5 +71,5 @@ def test_merge_datasets():
 def test_plot_minutes_ningredients_nsteps(monkeypatch):
     recipes_df = make_df_small()
     monkeypatch.setattr(plt, "show", lambda: None)
-    fig = pre.plot_minutes_ningredients_nsteps(recipes_df, show=False, return_fig=True)
+    fig = plot_minutes_ningredients_nsteps(recipes_df, show=False, return_fig=True)
     assert fig is not None
