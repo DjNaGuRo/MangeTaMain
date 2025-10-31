@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Données volumineuses
 *.csv
 *.pkl
@@ -17,6 +16,7 @@ __pycache__/
 .venv
 venv/
 ENV/
+mangetamain-venv/
 
 # IDE
 .vscode/
@@ -29,7 +29,6 @@ Thumbs.db
 
 # Docker
 .dockerignore
-=======
 data/raw/*.csv
 data/processed/*
 venv/
@@ -39,4 +38,3 @@ MangeTaMain/tests/__pycache__/*
 /notebooks/subdir/nltk_data/*
 src/*pycache*
 *.coverage
->>>>>>> main
