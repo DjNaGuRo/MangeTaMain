@@ -1,46 +1,42 @@
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 WORKDIR /app
 
-# Installer les dépendances
-RUN apt-get update && apt-get install -y \
+# Installer les dépendances système
+RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     curl \
-    git \
     && rm -rf /var/lib/apt/lists/*
 
 # Variables d'environnement
-ENV STREAMLIT_BROWSER_GATHER_USAGE_STATS=false \
-    PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
 
-# Installer Poetry
-RUN pip install poetry
+# Copier et intaller les dépendances depuis poetry
+COPY pyproject.toml poetry.lock ./
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir poetry && \
+    poetry config virtualenvs.create false && \
+    poetry install --only=main --no-interaction --no-ansi
+ 
+# Copier les fichiers de données
+COPY data/ ./data/
 
-# Configurer Poetry
-RUN poetry config virtualenvs.create false
-
-# Copier les fichiers Poetry
-COPY pyproject.toml poetry.lock README.md ./
-
-# Installer les dépendances
-RUN poetry install --only=main --no-root
-
-# Copier le code source
+# Copier tout le code source
 COPY src/ ./src/
 
+# Utilisateur non-root pour la sécurité
+RUN useradd --create-home --shell /bin/bash appuser && \
+    chown -R appuser:appuser /app
+USER appuser
 
-# Créer un utilisateur non-root
-RUN useradd --create-home --shell /bin/bash app && \
-    chown -R app:app /app
-USER app
-
-# Exposer le port
+# Port Streamlit
 EXPOSE 8501
 
-# Healthcheck
+# Vérification de santé
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD curl --fail http://localhost:8501/_stcore/health || exit 1
 
-# ✅ CHEMIN CORRIGÉ
-CMD ["streamlit", "run", "src/streamlit/app/streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+# Démarrage de l'application
+CMD ["streamlit", "run", "src/streamlit/app/streamlit_app.py", "--server.address=0.0.0.0", "--server.port=8501"]
