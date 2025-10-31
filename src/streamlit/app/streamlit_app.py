@@ -73,8 +73,9 @@ except Exception as e:
 
 
 from src.streamlit.app.utils import _ensure_src_on_path, get_ds, render_viz, _safe_rerun
-from src.streamlit.app.layouts.data_cleaning import show_data_page
-from src.streamlit.app.layouts.visualisation import show_visualizations
+from src.streamlit.app.layouts.page_data_cleaning import show_data_page
+from src.streamlit.app.layouts.page_visualisation import show_visualizations
+from src.streamlit.app.layouts.page_conclusion import show_conclusion_page
 
 # ---------------------------------------------------------------------------
 # Thème
@@ -165,6 +166,7 @@ PAGES_ORDER = [
     ("🏠 Accueil", "home", lambda: show_home_page()),
     ("📊 Données cleaning", "data", lambda: show_data_page()),
     ("📈 Visualisations", "viz", lambda: show_visualizations()),
+    ("📝 Conclusion", "conclusion", lambda: show_conclusion_page()),
 ]
 
 
