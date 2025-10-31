@@ -42,6 +42,7 @@ except Exception as e:
 
 from src.streamlit.app.utils import get_ds, render_viz, _safe_rerun
 
+
 # ---------------------------------------------------------------------------
 # Page Data cleaning
 # ---------------------------------------------------------------------------
@@ -244,4 +245,3 @@ def show_data_page():
         - protéines : 10 ~ 100 g > suppression des recettes à plus de 500g  
         - Sodium : 200 ~ 1500 mg > suppression des recettes à plus de 5000mg  """
     )
-
