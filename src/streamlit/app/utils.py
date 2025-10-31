@@ -1,5 +1,5 @@
 from pathlib import Path
-import sys
+import sys, inspect
 import streamlit as st
 import pandas as pd
 import numpy as np
