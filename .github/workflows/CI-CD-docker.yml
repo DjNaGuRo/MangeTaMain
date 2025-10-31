@@ -30,6 +30,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          poetry lock
           poetry install
           poetry add --group dev flake8 black
 
@@ -61,7 +62,7 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Install dependencies
-        run: poetry install
+        run: poetry lock &&poetry install
 
       - name: Run tests (if available)
         run: |
