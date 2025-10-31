@@ -1,0 +1,73 @@
+name: CI/CD - Streamlit Cloud Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - visualisation  # Ajouter votre branche actuelle
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  quality:
+    name: Code Quality & Linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: |
+          poetry install
+          poetry add --group dev flake8 black
+
+      - name: Run flake8
+        run: poetry run flake8 src/ --max-line-length=88 --extend-ignore=E203,W503
+        continue-on-error: true  # Ne pas bloquer si erreurs
+
+      - name: Check formatting with Black
+        run: poetry run black --check src/
+        continue-on-error: true
+
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: quality
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: poetry install
+
+      - name: Run tests (if available)
+        run: |
+          if [ -d "tests" ]; then
+            poetry run pytest tests/ -v
+          else
+            echo "No tests directory found, skipping..."
+          fi
+        continue-on-error: true  # Ne pas bloquer si erreurs

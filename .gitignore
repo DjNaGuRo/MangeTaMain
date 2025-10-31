@@ -1,3 +1,34 @@
+# Données volumineuses
+*.csv
+*.pkl
+*.parquet
+*.xlsx
+*.xls
+
+# Cache et build
+__pycache__/
+*.pyc
+.pytest_cache/
+.streamlit/
+
+# Environnement
+.env
+.venv
+venv/
+ENV/
+mangetamain-venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+.dockerignore
 data/raw/*.csv
 data/processed/*
 venv/
@@ -6,3 +37,4 @@ MangeTaMain/tests/__pycache__/*
 *.pkl
 /notebooks/subdir/nltk_data/*
 src/*pycache*
+*.coverage

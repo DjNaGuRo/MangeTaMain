@@ -1,18 +1,23 @@
-[project]
-name = "eda_project"
-version = "0.1.0"
-description = "Exploratory Data Analysis project"
-readme = "README.md"
-requires-python = ">=3.11,<3.14"  # tu es en Python 3.13, donc on l’autorise
-
-# tu ajouteras tes deps plus tard via `poetry add ...`
-dependencies = ["numpy (>=2.3.4,<3.0.0)", "pandas (>=2.3.3,<3.0.0)", "matplotlib (>=3.10.7,<4.0.0)", "seaborn (>=0.13.2,<0.14.0)"]
-
-# Désactiver le “package mode” pour le moment (pas d’installation du code comme package)
 [tool.poetry]
+name = "mange-ta-main"
+version = "0.1.0"
+description = "Application Streamlit pour recommandation de recettes"
+authors = ["Leonnel SOP <leonnel.sop@telecom-paris.fr>"]
+readme = "README.md"
 package-mode = false
 
-# Outils de dev (facultatif pour l’instant)
+[tool.poetry.dependencies]
+python = ">=3.11,<3.14"
+numpy = ">=2.3.4,<3.0.0"
+pandas = ">=2.3.3,<3.0.0"
+matplotlib = ">=3.10.0,<4.0.0"
+seaborn = ">=0.13.2,<0.14.0"
+streamlit = "^1.39.0"
+plotly = ">=5.24.1,<6.0.0"
+nbformat = "^5.10.0"
+nbconvert = "^7.14.0"
+pyyaml = "^6.0.3"
+
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
 black = "^24.0.0"
