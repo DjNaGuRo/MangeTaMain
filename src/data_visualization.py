@@ -1015,7 +1015,7 @@ def analyze_tags_correlation(
         hue="mean_negative_score",
         ax=ax[0],
     )
-    ax[0].set_title("Top 10 catégories de recettes les plus critiquées")
+    ax[0].set_title("Top 10 des tags de recettes les plus critiqués")
     ax[0].set_xlabel("Score moyen d’insatisfaction")
     ax[0].set_ylabel("Tag (type de recette)")
     ax[0].grid(axis="x", alpha=0.25)
