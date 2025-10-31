@@ -310,7 +310,7 @@ def show_home_page():
 
     st.markdown("## INTRODUCTION")
     st.markdown(
-        """Notre équipe composé de Guy, Mohamed, Leonel Omar et Osman avons décidé de travailler sur le projet MangeTaMain sur la problématique 
+        """Notre équipe composé de Guy, Mohamed, Leonnel, Omar et Osman avons décidé de travailler sur le projet MangeTaMain sur la problématique 
             du **taux d'insatisfaction des recettes** en nous basant sur 2 tables : les recettes et les interactions utilisateurs (notes, avis).
             Voici un aperçu de la table recette :
                 """
@@ -548,7 +548,7 @@ def show_data_page():
     )
 
 
-# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------ra
 # Page Visualisations
 # ---------------------------------------------------------------------------
 def show_visualizations():
@@ -574,6 +574,12 @@ def show_visualizations():
             "Moyennes des notes par utilisateur",
             user_mean_rating_distribution,
             df_inter,
+        )
+        
+        render_viz(
+            "Analyse des contributeurs des recettes",
+            analyze_contributors,
+            df_clean_recipes,
         )
 
     with tabs[1]:
