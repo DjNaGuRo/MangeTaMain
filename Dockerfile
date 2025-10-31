@@ -13,20 +13,18 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
 
-# Installer directement les dépendances principales
+# Copier et intaller les dépendances depuis poetry
+COPY pyproject.toml poetry.lock ./
 RUN pip install --upgrade pip && \
-    pip install --no-cache-dir \
-    streamlit \
-    pandas \
-    numpy \
-    plotly \
-    scikit-learn \
-    matplotlib \
-    seaborn
+    pip install --no-cache-dir poetry && \
+    poetry config virtualenvs.create false && \
+    poetry install --only=main --no-interaction --no-ansi
+ 
+# Copier les fichiers de données
+COPY data/ ./data/
 
 # Copier tout le code source
 COPY src/ ./src/
-COPY streamlit_app/ ./streamlit_app/
 
 # Utilisateur non-root pour la sécurité
 RUN useradd --create-home --shell /bin/bash appuser && \

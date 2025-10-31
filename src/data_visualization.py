@@ -81,6 +81,41 @@ def rating_distribution(
     return _finalize(fig, show, return_fig)
 
 
+# fonction d'affichage des boxplots minutes, n_ingredients, n_steps
+
+
+def plot_minutes_ningredients_nsteps(
+    data_recipes: pd.DataFrame, show: bool = False, return_fig: bool = False
+):
+    """Trace le boxplot des minutes, du nombre d'ingrédients et du nombre d'étapes.
+
+    Args:
+        raw_recipes (pd.DataFrame): DataFrame contenant les données brutes des recettes.
+        show (bool, optional): Indique si le graphique doit être affiché. Par défaut False.
+        return_fig (bool, optional): Indique si la figure doit être retournée. Par défaut False.
+
+    Returns:
+        Optional[plt.Figure]: La figure matplotlib si return_fig est True, sinon None.
+    """
+    fig = plt.figure(figsize=(12, 6))
+
+    plt.subplot(1, 3, 1)
+    plt.boxplot(data_recipes["n_ingredients"])
+    plt.title("Boxplot du nombre d'ingrédients")
+
+    plt.subplot(1, 3, 2)
+    plt.boxplot(data_recipes["n_steps"])
+    plt.title("Boxplot du nombre d'étapes")
+
+    plt.subplot(1, 3, 3)
+    plt.boxplot(data_recipes["minutes"])
+    plt.title("Boxplot du temps de préparation (minutes)")
+
+    plt.tight_layout()
+    plt.show()
+    return _finalize(fig, show, return_fig)
+
+
 # ---------------------------------------------------------------------
 # 2) Distribution des moyennes par recette + KDE
 # ---------------------------------------------------------------------
@@ -790,9 +825,7 @@ def plot_nutrition_distribution(
     sns.histplot(df["total_fat"], bins=20, kde=False, ax=axes[1, 1], color="purple")
     axes[1, 1].set_title("Distribution des graisses totales")
     axes[1, 1].set_xlabel("Graisses totales (g)")
-    sns.histplot(
-        df["carbohydrates"], bins=20, kde=False, ax=axes[1, 2], color="brown"
-    )
+    sns.histplot(df["carbohydrates"], bins=20, kde=False, ax=axes[1, 2], color="brown")
     axes[1, 2].set_title("Distribution des carbohydrates")
     axes[1, 2].set_xlabel("Carbohydrates (g)")
     fig.tight_layout()
