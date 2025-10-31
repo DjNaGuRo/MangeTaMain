@@ -1,0 +1,39 @@
+
+
+# Version du format docker-compose (CORRECTION: doit être '3.8' au lieu de '28.4.0')
+version: '3.8'
+
+# Définition des services (conteneurs) de l'application
+services:
+  # Nom du service principal qui contient l'application Streamlit
+  streamlit-app:
+    
+    # Configuration de la construction de l'image Docker
+    build:
+      context: .              # Utilise le répertoire courant comme contexte de build
+      dockerfile: Dockerfile  # Spécifie le fichier Dockerfile à utiliser
+    
+    # Mappage des ports : port_hôte:port_conteneur
+    ports:
+      - "8501:8501"  # Expose le port 8501 du conteneur sur le port 8501 de l'hôte
+    
+    # Variables d'environnement passées au conteneur
+    environment:
+      - STREAMLIT_SERVER_PORT=8501           # Port d'écoute de Streamlit
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0     # Adresse d'écoute (toutes les interfaces)
+      - STREAMLIT_BROWSER_GATHER_USAGE_STATS=false  # Désactive la collecte de stats
+    
+    # Montage de volumes : chemin_hôte:chemin_conteneur
+    volumes:
+      - ./src:/app/src  # Monte le dossier src local dans le conteneur (développement en live)
+    
+    # Politique de redémarrage automatique
+    restart: unless-stopped  # Redémarre automatiquement sauf si arrêt manuel
+    
+    # Configuration de la vérification de santé du conteneur
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]  # Commande de test
+      interval: 30s      # Intervalle entre chaque vérification (30 secondes)
+      timeout: 10s       # Timeout pour chaque test (10 secondes)
+      retries: 3         # Nombre de tentatives avant de marquer comme "unhealthy"
+      start_period: 40s  # Délai d'attente avant la première vérification (40 secondes)
