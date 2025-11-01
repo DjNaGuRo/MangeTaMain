@@ -141,6 +141,15 @@ poetry run black src/
 poetry run flake8 src/ --max-line-length=88
 ```
 
+### Logs et debugging
+Le projet génère des logs détaillés dans le répertoire `logs/` :
+```bash
+# Vérifier les logs de l'application
+tail -f logs/app.log       # Messages INFO et supérieurs
+tail -f logs/debug.log     # Tous les messages (DEBUG et supérieurs)  
+tail -f logs/error.log     # Seulement les erreurs (ERROR et CRITICAL)
+```
+
 ## 📚 Documentation
 
 La documentation complète est générée avec Sphinx et disponible dans le dossier `docs/`. Pour consulter la documentation :

@@ -43,3 +43,7 @@ src/*pycache*
 docs/_build/
 docs/_static/
 docs/_templates/
+
+# Logs
+logs/
+*.log

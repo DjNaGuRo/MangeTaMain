@@ -28,6 +28,16 @@ def _ensure_src_on_path():
 
 
 PROJECT_ROOT = _ensure_src_on_path()
+
+# Initialize logging
+try:
+    from src.logging_config import get_logger
+    logger = get_logger('streamlit')
+    logger.info("Starting MangeTaMain Streamlit application")
+except Exception as e:
+    print(f"Warning: Could not initialize logging: {e}")
+    logger = None
+
 # ---------------------------------------------------------------------------
 # Imports visualisation
 # ---------------------------------------------------------------------------
@@ -193,18 +203,40 @@ def _set_page_by_key(page_key: str):
 # Main
 # ---------------------------------------------------------------------------
 def main():
+    if logger:
+        logger.info("Initializing Streamlit application main interface")
+    
     st.set_page_config(page_title="MangeTaMain", page_icon="🍽️", layout="wide")
     _init_page_state()
+    
     if "theme" not in st.session_state:
         st.session_state.theme = "Clair"
     set_custom_theme(st.session_state.theme)
+    
+    if logger:
+        logger.debug(f"Theme set to: {st.session_state.theme}")
 
-    ds = get_ds()
+    try:
+        ds = get_ds()
+        if logger:
+            logger.info("Successfully loaded datasets for main interface")
+            for key, df in ds.items():
+                if df is not None:
+                    logger.debug(f"Dataset '{key}': {df.shape}")
+                else:
+                    logger.warning(f"Dataset '{key}' is None")
+    except Exception as e:
+        if logger:
+            logger.error(f"Error loading datasets in main: {str(e)}")
+        st.error("Erreur lors du chargement des données")
+        return
 
     # Barre supérieure avec chevrons
     top_left, top_center, top_right = st.columns([0.7, 5, 0.7])
     with top_left:
         if st.button("◀"):
+            if logger:
+                logger.debug("User navigated to previous page")
             _go_delta(-1)
             _safe_rerun()
     with top_center:
@@ -214,6 +246,8 @@ def main():
         )
     with top_right:
         if st.button("▶"):
+            if logger:
+                logger.debug("User navigated to next page")
             _go_delta(1)
             _safe_rerun()
 
@@ -228,6 +262,8 @@ def main():
             for i, (lbl, key, _) in enumerate(PAGES_ORDER):
                 if lbl == selected:
                     st.session_state.current_page_idx = i
+                    if logger:
+                        logger.info(f"User navigated to page: {lbl} (key: {key})")
                     _safe_rerun()
                     break
         st.selectbox(
