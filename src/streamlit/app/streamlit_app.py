@@ -7,6 +7,7 @@ import sys, inspect
 from pathlib import Path
 
 import yaml
+from src.ensure_data import ensure_data
 
 
 # ---------------------------------------------------------------------------
@@ -27,12 +28,11 @@ def _ensure_src_on_path():
     return project_root
 
 
-PROJECT_ROOT = _ensure_src_on_path()
-
 # Initialize logging
 try:
     from src.logging_config import get_logger
-    logger = get_logger('streamlit')
+
+    logger = get_logger("streamlit")
     logger.info("Starting MangeTaMain Streamlit application")
 except Exception as e:
     print(f"Warning: Could not initialize logging: {e}")
@@ -145,11 +145,11 @@ def show_home_page():
                 """
     )
 
-    st.dataframe(recipes_df.head(5), use_container_width=True)
+    st.dataframe(recipes_df.head(5), width="stretch")
 
     st.markdown("""et voici un aperçu de la table interactions :""")
 
-    st.dataframe(raw_interactions.head(5), use_container_width=True)
+    st.dataframe(raw_interactions.head(5), width="stretch")
 
     st.markdown(
         """Le travaille se décline en plusieurs étapes :  
@@ -205,14 +205,16 @@ def _set_page_by_key(page_key: str):
 def main():
     if logger:
         logger.info("Initializing Streamlit application main interface")
-    
+    if "data_ready" not in st.session_state:
+        ensure_data()
+        st.session_state.data_ready = True
     st.set_page_config(page_title="MangeTaMain", page_icon="🍽️", layout="wide")
     _init_page_state()
-    
+
     if "theme" not in st.session_state:
         st.session_state.theme = "Clair"
     set_custom_theme(st.session_state.theme)
-    
+
     if logger:
         logger.debug(f"Theme set to: {st.session_state.theme}")
 
