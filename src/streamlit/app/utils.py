@@ -5,6 +5,14 @@ import pandas as pd
 import numpy as np
 import yaml
 
+# Initialize logging
+try:
+    from src.logging_config import get_logger
+    logger = get_logger('streamlit.utils')
+except Exception as e:
+    print(f"Warning: Could not initialize logging in utils: {e}")
+    logger = None
+
 
 # ---------------------------------------------------------------------------
 # Setup chemin src
@@ -44,21 +52,47 @@ def _read_csv(rel):
 @st.cache_data(show_spinner=False)
 def load_all_datasets():
     """Charge une seule fois toutes les données utiles et les retourne dans un dict."""
-    merged_df = _read_csv("data/processed/merged_cleaned.csv")
-    interactions = _read_csv("data/processed/interactions_cleaned.csv")
-    clean_recipes = _read_csv("data/processed/recipes_cleaned.csv")
-    raw_recipes = _read_csv("data/raw/RAW_recipes.csv")
-    raw_interactions = _read_csv("data/raw/RAW_interactions.csv")
-    print(f"clean_recipes: {clean_recipes.shape}")
-    print(f"raw_recipes: {raw_recipes.shape}")
-    print(f"interactions: {interactions.shape}")
-    return {
-        "merged": merged_df,
-        "interactions": interactions,
-        "clean_recipes": clean_recipes,
-        "raw_recipes": raw_recipes,
-        "raw_interactions": raw_interactions,
-    }
+    if logger:
+        logger.info("Loading all datasets for Streamlit application")
+    
+    try:
+        merged_df = _read_csv("data/processed/merged_cleaned.csv")
+        interactions = _read_csv("data/processed/interactions_cleaned.csv")
+        clean_recipes = _read_csv("data/processed/recipes_cleaned.csv")
+        raw_recipes = _read_csv("data/raw/RAW_recipes.csv")
+        raw_interactions = _read_csv("data/raw/RAW_interactions.csv")
+        
+        # Log dataset information
+        datasets_info = {}
+        for name, df in [
+            ("merged", merged_df),
+            ("interactions", interactions),
+            ("clean_recipes", clean_recipes),
+            ("raw_recipes", raw_recipes),
+            ("raw_interactions", raw_interactions)
+        ]:
+            if df is not None:
+                datasets_info[name] = df.shape
+                if logger:
+                    logger.debug(f"Dataset '{name}': {df.shape}")
+            else:
+                if logger:
+                    logger.warning(f"Dataset '{name}' could not be loaded")
+        
+        if logger:
+            logger.info(f"Successfully loaded {len([d for d in datasets_info.values() if d is not None])} datasets")
+        
+        return {
+            "merged": merged_df,
+            "interactions": interactions,
+            "clean_recipes": clean_recipes,
+            "raw_recipes": raw_recipes,
+            "raw_interactions": raw_interactions,
+        }
+    except Exception as e:
+        if logger:
+            logger.error(f"Error loading datasets: {str(e)}")
+        raise
 
 
 # --- Chargement commentaires externes (YAML) ---
@@ -156,17 +190,30 @@ def render_viz(
 ):
     if df is None:
         st.warning(f"{label}: dataset manquant")
+        if logger:
+            logger.warning(f"Visualization '{label}' skipped: dataset is None")
         return
+    
+    if logger:
+        logger.debug(f"Rendering visualization: {label} with function {func.__name__}")
+    
     block = st.expander(label, expanded=not expander) if expander else st.container()
     with block:
         if FAST_MODE and sample_if_fast and len(df) > sample_if_fast:
+            if logger:
+                logger.debug(f"Sampling dataset for {label}: {len(df)} -> {sample_if_fast} rows")
             df = df.sample(sample_if_fast, random_state=42)
         try:
             fig = func(df, return_fig=True, **kwargs)
             if fig is None:
                 st.info("Figure non retournée.")
+                if logger:
+                    logger.warning(f"Function {func.__name__} returned None for visualization {label}")
                 return
             st.pyplot(fig, use_container_width=True)
+            if logger:
+                logger.debug(f"Successfully rendered visualization: {label}")
+            
             if show_doc:
                 doc = inspect.getdoc(func)
                 comment = get_comment(func.__name__)
@@ -179,7 +226,10 @@ def render_viz(
             if FAST_MODE:
                 st.caption("FAST_MODE actif (échantillonnage).")
         except Exception as e:
-            st.error(f"Erreur: {e}")
+            error_msg = f"Erreur: {e}"
+            st.error(error_msg)
+            if logger:
+                logger.error(f"Error rendering visualization '{label}' with function {func.__name__}: {str(e)}")
 
 
 def _safe_rerun():

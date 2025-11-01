@@ -16,6 +16,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# Initialize logging for visualizations
+try:
+    from .logging_config import get_logger
+    logger = get_logger('visualization')
+except Exception as e:
+    print(f"Warning: Could not initialize logging in data_visualization: {e}")
+    logger = None
+
 # Ma palette fixe (Jaune, Bleu, Rouge, Vert, Violet, Gris)
 PALETTE: Tuple[str, ...] = (
     "#F2C94C",  # jaune
@@ -63,22 +71,36 @@ def rating_distribution(
     kde: bool = True,
 ):
     """Je trace la distribution des notes (1..5). Je peux ajouter un KDE."""
-    _need_cols(interactions, ["rating"])
-    s = pd.to_numeric(interactions["rating"], errors="coerce").dropna()
-    s = s[(s >= 1) & (s <= 5)]
+    try:
+        if logger:
+            logger.debug(f"Generating rating distribution visualization (kde={kde})")
+        
+        _need_cols(interactions, ["rating"])
+        s = pd.to_numeric(interactions["rating"], errors="coerce").dropna()
+        s = s[(s >= 1) & (s <= 5)]
+        
+        if logger:
+            logger.debug(f"Rating data: {len(s)} valid ratings out of {len(interactions)} total")
 
-    fig, ax = plt.subplots(figsize=(6, 4))
-    ax.hist(s, bins=[0.5, 1.5, 2.5, 3.5, 4.5, 5.5], color=PALETTE[1], edgecolor="white")
-    ax.set_title("Distribution des notes valides")
-    ax.set_xlabel("Note")
-    ax.set_ylabel("Nombre d'occurrences")
-    ax.set_xticks([1, 2, 3, 4, 5])
-    ax.grid(axis="y", alpha=0.25)
+        fig, ax = plt.subplots(figsize=(6, 4))
+        ax.hist(s, bins=[0.5, 1.5, 2.5, 3.5, 4.5, 5.5], color=PALETTE[1], edgecolor="white")
+        ax.set_title("Distribution des notes valides")
+        ax.set_xlabel("Note")
+        ax.set_ylabel("Nombre d'occurrences")
+        ax.set_xticks([1, 2, 3, 4, 5])
+        ax.grid(axis="y", alpha=0.25)
 
-    if kde:
-        sns.kdeplot(s, ax=ax, color=PALETTE[5], lw=2)
+        if kde:
+            sns.kdeplot(s, ax=ax, color=PALETTE[5], lw=2)
+        
+        if logger:
+            logger.debug("Successfully generated rating distribution plot")
 
-    return _finalize(fig, show, return_fig)
+        return _finalize(fig, show, return_fig)
+    except Exception as e:
+        if logger:
+            logger.error(f"Error generating rating distribution plot: {str(e)}")
+        raise
 
 
 # fonction d'affichage des boxplots minutes, n_ingredients, n_steps
