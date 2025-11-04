@@ -5,7 +5,17 @@ import pandas as pd
 import numpy as np
 import sys, inspect
 from pathlib import Path
+# --- Bootstrap pour que "from src..." fonctionne partout ---
+import sys
+from pathlib import Path
 
+_THIS = Path(__file__).resolve()
+for p in [_THIS, *_THIS.parents]:
+    if (p / "pyproject.toml").exists():
+        for a in (str(p), str(p / "src")):
+            if a not in sys.path:
+                sys.path.insert(0, a)
+        break
 import yaml
 from src.ensure_data import ensure_data
 

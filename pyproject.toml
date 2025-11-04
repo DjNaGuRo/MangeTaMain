@@ -19,6 +19,8 @@ nbconvert = "^7.14.0"
 pyyaml = "^6.0.3"
 scipy = "^1.16.3"
 gdown = "^5.2.0"
+pyarrow = "^22.0.0"
+charset-normalizer = "^3.4.4"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
