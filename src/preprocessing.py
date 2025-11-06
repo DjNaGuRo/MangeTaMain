@@ -6,6 +6,24 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from .logging_config import get_logger
 
+# étude des avis négatifs
+# Importation des constantes
+from .constants import (
+    NEGATION_WORDS,
+    POSITIVE_WORDS,
+    NEGATIVE_WORDS,
+    CONTRACTIONS,
+    SUBTLE_NEG_RE,
+    NEGATED_POS_RE,
+    CONTRACTIONS_RE,
+    TOKEN_RE,
+    SENTENCE_SPLIT_RE,
+    CLAUSE_BREAKERS,
+    DEFAULT_NEGATION_WINDOW,
+    NUTRITION_THRESHOLDS,
+)
+
+
 logger = get_logger('preprocessing')
 
 try:
@@ -77,23 +95,6 @@ def save_cleaned_datasets(cleaned_df, file_name, output_dir="../data/processed")
         logger.error(f"Error saving cleaned dataset {file_name}: {str(e)}")
         raise
 
-
-# étude des avis négatifs
-# Importation des constantes
-from .constants import (
-    NEGATION_WORDS,
-    POSITIVE_WORDS,
-    NEGATIVE_WORDS,
-    CONTRACTIONS,
-    SUBTLE_NEG_RE,
-    NEGATED_POS_RE,
-    CONTRACTIONS_RE,
-    TOKEN_RE,
-    SENTENCE_SPLIT_RE,
-    CLAUSE_BREAKERS,
-    DEFAULT_NEGATION_WINDOW,
-    NUTRITION_THRESHOLDS,
-)
 
 
 def clean_review(text: str, window: int = 3) -> str:
