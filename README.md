@@ -87,10 +87,10 @@ eval $(poetry env activate)
 
 ## 🚀 Utilisation
 
-### Préparation des données
-Placez les données brutes dans le répertoire `data/raw` et les données nettoyées dans `data/processed` (ces dernières peuvent être obtenues en lançant le notebook `notebooks/data_cleaning.ipynb`).
 
 ### Lancement de l'application Streamlit
+
+Au premier lancement, les données seront automatiquement téléchargées et extraites dans `data/raw` et `data/processed` si elles sont absentes, grâce à la fonction `ensure_data` (voir la variable d'environnement `DATA_REMOTE_URL`).
 
 **Option 1: Via Docker Compose**
 ```bash
@@ -113,12 +113,10 @@ L'application est organisée en plusieurs pages :
 - 📈 **Visualisations** : Distribution des ratings, analyse des contributeurs, corrélations nutritionnelles, analyse de sentiment
 - 📝 **Conclusion** : Synthèse des résultats et perspectives
 
-### Utilisation des notebooks
 
-**Notebook de nettoyage des données :**
-```bash
-poetry run jupyter notebook notebooks/data_cleaning.ipynb
-```
+### Utilisation des notebooks (optionnel)
+
+Les notebooks sont fournis pour l'exploration, le nettoyage ou l'analyse avancée des données. Ils ne sont pas nécessaires pour l'utilisation standard de l'application, car les données sont automatiquement gérées.
 
 **Notebook de visualisation :**
 ```bash
@@ -174,10 +172,10 @@ open _build/html/index.html
 start _build/html/index.html
 ```
 
+
 ### API Reference
 
 La documentation automatique inclut :
-- [`data_loader`](docs/api/data_loader.md) : Fonctions de chargement des données
 - [`preprocessing`](docs/api/preprocessing.md) : Fonctions de nettoyage et préprocessing
 - [`data_visualization`](docs/api/data_visualization.md) : Fonctions de visualisation
 - [`streamlit_app`](docs/api/streamlit_app.md) : Application Streamlit
