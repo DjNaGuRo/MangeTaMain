@@ -36,12 +36,11 @@ def ensure_data():
         _log("Données présentes → skip.")
         return
 
+
     if not remote_url:
-        if mode == "dev":
-            _log("Dev sans URL → skip.")
-            st.warning("Pas de données et pas d'URL (dev).")
-            return
-        raise RuntimeError("DATA_REMOTE_URL manquant (prod).")
+        _log("Aucune URL de données fournie et les dossiers de données sont absents.")
+        st.error("Aucune donnée trouvée et DATA_REMOTE_URL n'est pas défini. Veuillez configurer la variable d'environnement DATA_REMOTE_URL avec le lien de téléchargement des données (zip).")
+        raise RuntimeError("Aucune donnée trouvée et DATA_REMOTE_URL n'est pas défini. Veuillez configurer la variable d'environnement DATA_REMOTE_URL.")
 
     _log(f"Téléchargement: {remote_url}")
     try:
