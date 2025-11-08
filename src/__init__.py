@@ -10,8 +10,17 @@ __author__ = "Votre Nom"
 from . import data_loader
 from . import preprocessing
 from . import data_visualization
+from . import data_management_with_psql
 
 # Optionnel: exposer les fonctions les plus utilisées
+from .data_management_with_psql import (
+    load_clean_recipes_from_db,
+    load_clean_interactions_from_db,
+    load_clean_merged_from_db,
+    load_recipes_data_from_db,
+    load_interactions_data_from_db,
+)
+
 from .data_loader import (
     load_interactions_data,
     load_recipes_data,
@@ -24,6 +33,8 @@ from .preprocessing import detect_missing_values
 
 __all__ = [
     "data_loader",
+    "data_management_with_psql",
+    "ensure_data",
     "preprocessing",
     "load_interactions_data",
     "load_recipes_data",

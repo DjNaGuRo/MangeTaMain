@@ -47,3 +47,6 @@ docs/_templates/
 # Logs
 logs/
 *.log
+
+# Jupyter Notebook tests files
+notebooks/test_notebook.ipynb

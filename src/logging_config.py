@@ -93,6 +93,11 @@ def setup_logging():
                 'handlers': ['console', 'debug_file', 'error_file', 'app_file'],
                 'propagate': False
             },
+            'mangetamain.data_management_with_psql': {
+                'level': 'DEBUG',
+                'handlers': ['console', 'debug_file', 'error_file', 'app_file'],
+                'propagate': False
+            },
             'mangetamain.preprocessing': {
                 'level': 'DEBUG',
                 'handlers': ['console', 'debug_file', 'error_file', 'app_file'],

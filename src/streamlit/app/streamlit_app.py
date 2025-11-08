@@ -5,10 +5,16 @@ import pandas as pd
 import numpy as np
 import sys, inspect
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+# import os
+# print('CWD:', os.getcwd())
+# print('sys.path:', sys.path)
+# print('CWD:', os.getcwd())
+# print('src exists:', Path('src').exists())
+# print('ensure_data exists:', Path('src/ensure_data.py').exists())
 
 import yaml
 from src.ensure_data import ensure_data
-
 
 # ---------------------------------------------------------------------------
 # Setup chemin src
