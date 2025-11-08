@@ -6,7 +6,6 @@ MangeTaMain/
 ├── src/ # Code source principal
 │ ├── __init__.py
 │ ├── constants.py # Constantes globales
-│ ├── data_loader.py # Chargement des données
 │ ├── preprocessing.py # Nettoyage et préprocessing
 │ ├── data_visualization.py # Fonctions de visualisation
 │ └── streamlit/ # Application Streamlit
@@ -18,10 +17,9 @@ MangeTaMain/
 │ ├── data_cleaning.ipynb
 │ └── data_vizualisation.ipynb
 ├── tests/ # Tests unitaires
-├── data/ # Données (non versionnées)
-│ ├── raw/ # Données brutes
-│ └── processed/ # Données nettoyées
 ├── docs/ # Documentation Sphinx
 ├── docker-compose.yml # Configuration Docker
 ├── Dockerfile # Image Docker
 └── pyproject.toml # Configuration Poetry
+
+> **Note :** Les données sont désormais chargées depuis une base PostgreSQL distante, et non plus depuis des fichiers locaux.

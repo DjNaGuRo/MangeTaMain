@@ -1,8 +1,9 @@
-## Lancement de l'application
 
-L'application peut être lancé soit via docker compose ou soit directement streamlit run
+# Lancement de l'application
 
-Tout d'aboord, il faut placez les données brutes dans le répertoire `data/raw` et les données netoyées dans `data/processed` (ces dernières peuvent être obtenues en lançant le notebook `notebooks/data_cleaning.ipynb`)
+L'application charge désormais toutes les données directement depuis une base PostgreSQL distante. Assurez-vous d'avoir configuré les variables d'environnement nécessaires (voir `database_config.md`).
+
+Vous pouvez lancer l'application soit via Docker Compose, soit directement avec Streamlit :
 
 1. Lancez l'application via docker compose:
 ```bash
@@ -16,7 +17,8 @@ poetry run streamlit run src/streamlit/app/streamlit_app.py
 
 L'application sera disponible sur http://localhost:8501
 
-## Navigation dans l'interface
+
+# Navigation dans l'interface
 
 L'application est organisée en plusieurs pages :
 
@@ -46,29 +48,35 @@ Présentation du projet et aperçu des données
 Synthèse des résultats et perspectives
 
 
-## Utilisation des notebooks
 
-#### Notebook principal
+# Utilisation des notebooks
+
+
+## Notebook principal
 
 ```bash
 poetry run jupyter notebook notebooks/data_cleaning.ipynb
 ```
 
-#### Notebook de visualisation
+
+## Notebook de visualisation
 
 ```bash
 poetry run jupyter notebook notebooks/data_vizualisation.ipynb
 ```
 
-## Tests
 
-#### Lancer les tests unitaires :
+# Tests
+
+
+## Lancer les tests unitaires
 
 ```bash
 poetry run pytest tests/ -v
 ```
 
-## Linting et formatage
+
+# Linting et formatage
 
 ```bash
 # Formatage avec Black

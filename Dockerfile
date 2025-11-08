@@ -20,19 +20,24 @@ RUN pip install --upgrade pip && \
     poetry config virtualenvs.create false && \
     poetry install --only=main --no-interaction --no-ansi
  
-# Copier les fichiers de données
-COPY data/ ./data/
 
-# Copier tout le code source
+
+
+# Copier le code source et les fichiers de configuration
 COPY src/ ./src/
+COPY .env.template ./
+COPY README.md ./
+
 
 # Utilisateur non-root pour la sécurité
 RUN useradd --create-home --shell /bin/bash appuser && \
     chown -R appuser:appuser /app
 USER appuser
 
+
 # Port Streamlit
 EXPOSE 8501
+
 
 # Vérification de santé
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \

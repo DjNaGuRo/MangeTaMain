@@ -12,19 +12,13 @@ L'objectif principal est d'identifier les caractéristiques communes aux **recet
 
 ## 📊 Datasets
 
-Le projet exploite deux jeux de données principaux :
 
-### Dataset Recipes
-- Informations descriptives des recettes (nom, description, type de plat)
-- Ingrédients et temps de préparation
-- Données nutritionnelles (calories, lipides, glucides, protéines, etc.)
-- Métadonnées (portions, difficulté, tags)
+Les données sont désormais stockées et chargées depuis une base de données PostgreSQL distante. Les jeux de données principaux sont :
 
-### Dataset Interactions
-- Notes attribuées aux recettes (1-5)
-- Commentaires et avis textuels
-- Données d'activité utilisateurs
-- Métadonnées temporelles
+- **Recettes** : Informations descriptives, ingrédients, temps de préparation, valeurs nutritionnelles, tags, etc.
+- **Interactions** : Notes, avis textuels, activité utilisateur, métadonnées temporelles.
+
+La connexion à la base de données se fait via des variables d'environnement (voir `docs/database_config.md`).
 
 ## 🏗️ Structure du Projet
 
@@ -32,7 +26,6 @@ Le projet exploite deux jeux de données principaux :
 MangeTaMain/
 ├── src/                          # Code source principal
 │   ├── __init__.py
-│   ├── data_loader.py           # Chargement des données
 │   ├── preprocessing.py         # Nettoyage et préprocessing
 │   ├── data_visualization.py    # Fonctions de visualisation
 │   └── streamlit/               # Application Streamlit
@@ -44,9 +37,6 @@ MangeTaMain/
 │   ├── data_cleaning.ipynb
 │   └── data_vizualisation.ipynb
 ├── tests/                       # Tests unitaires
-├── data/                        # Données (non versionnées)
-│   ├── raw/                     # Données brutes
-│   └── processed/               # Données nettoyées
 ├── docs/                        # Documentation Sphinx
 ├── docker-compose.yml           # Configuration Docker
 ├── Dockerfile                   # Image Docker
@@ -85,10 +75,13 @@ poetry shell
 eval $(poetry env activate)
 ```
 
+
 ## 🚀 Utilisation
 
-### Préparation des données
-Placez les données brutes dans le répertoire `data/raw` et les données nettoyées dans `data/processed` (ces dernières peuvent être obtenues en lançant le notebook `notebooks/data_cleaning.ipynb`).
+### Configuration de la base de données
+
+1. Créez un fichier `.env` à la racine du projet (voir `docs/database_config.md` pour le format et les variables requises).
+2. Renseignez les identifiants de connexion à votre base PostgreSQL distante.
 
 ### Lancement de l'application Streamlit
 
@@ -113,7 +106,7 @@ L'application est organisée en plusieurs pages :
 - 📈 **Visualisations** : Distribution des ratings, analyse des contributeurs, corrélations nutritionnelles, analyse de sentiment
 - 📝 **Conclusion** : Synthèse des résultats et perspectives
 
-### Utilisation des notebooks
+### Utilisation des notebooks (optionnel)
 
 **Notebook de nettoyage des données :**
 ```bash
@@ -177,7 +170,6 @@ start _build/html/index.html
 ### API Reference
 
 La documentation automatique inclut :
-- [`data_loader`](docs/api/data_loader.md) : Fonctions de chargement des données
 - [`preprocessing`](docs/api/preprocessing.md) : Fonctions de nettoyage et préprocessing
 - [`data_visualization`](docs/api/data_visualization.md) : Fonctions de visualisation
 - [`streamlit_app`](docs/api/streamlit_app.md) : Application Streamlit
@@ -211,7 +203,7 @@ Le projet suit une approche exploratoire structurée en trois phases :
 
 - **ABDILLAHI OMAR DJAMA**
 - **AMAR Mohamed**
-- **Bagci Osman**
+- **BAGCI Osman**
 - **DJOUNANG NANA Guy Rostan**
 - **SOP Leonnel Romuald**
 

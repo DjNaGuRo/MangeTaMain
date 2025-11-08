@@ -1,9 +1,17 @@
 from pathlib import Path
-import sys, inspect
+import sys
+import inspect
 import streamlit as st
 import pandas as pd
-import numpy as np
 import yaml
+
+from src.data_management_with_psql import (
+            load_recipes_data_from_db,
+            load_interactions_data_from_db,
+            load_clean_recipes_from_db,
+            load_clean_interactions_from_db,
+            load_clean_merged_from_db,
+        )
 
 # Initialize logging
 try:
@@ -55,13 +63,13 @@ def load_all_datasets():
     if logger:
         logger.info("Loading all datasets for Streamlit application")
     
-    try:
-        merged_df = _read_csv("data/processed/merged_cleaned.csv")
-        interactions = _read_csv("data/processed/interactions_cleaned.csv")
-        clean_recipes = _read_csv("data/processed/recipes_cleaned.csv")
-        raw_recipes = _read_csv("data/raw/RAW_recipes.csv")
-        raw_interactions = _read_csv("data/raw/RAW_interactions.csv")
-        
+    try:        
+        merged_df = load_clean_merged_from_db()
+        interactions = load_clean_interactions_from_db()
+        clean_recipes = load_clean_recipes_from_db()
+        raw_recipes = load_recipes_data_from_db()
+        raw_interactions = load_interactions_data_from_db()
+
         # Log dataset information
         datasets_info = {}
         for name, df in [
@@ -78,10 +86,10 @@ def load_all_datasets():
             else:
                 if logger:
                     logger.warning(f"Dataset '{name}' could not be loaded")
-        
+
         if logger:
-            logger.info(f"Successfully loaded {len([d for d in datasets_info.values() if d is not None])} datasets")
-        
+            logger.info(f"Successfully loaded {len([d for d in datasets_info.values() if d is not None])} datasets from DB")
+
         return {
             "merged": merged_df,
             "interactions": interactions,
@@ -91,7 +99,7 @@ def load_all_datasets():
         }
     except Exception as e:
         if logger:
-            logger.error(f"Error loading datasets: {str(e)}")
+            logger.error(f"Error loading datasets from DB: {str(e)}")
         raise
 
 

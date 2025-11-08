@@ -1,10 +1,10 @@
 services:
-  streamlit-app:
+  streamlit-app-with-psql:
     build:
       context: .
       dockerfile: Dockerfile
-
-    container_name: mangetamain-app
+    image: mangetamain-with-psql   # This names the built image
+    container_name: mangetamain-with-psql  # This names the running container
 
     ports:
       - "8501:8501"
@@ -15,9 +15,16 @@ services:
       - STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
       - APP_MODE=dev
       - PYTHONPATH=/app
-      - DATA_REMOTE_URL=https://drive.google.com/uc?id=1bc6Rfx0yjdwauFtuLnhtfjW_qFIQAqax&export=download
-    volumes:
-      - ./data:/app/data
+      # Variables d'environnement pour la base PostgreSQL distante (à définir dans .env ou dans le service)
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_SSLMODE=${DB_SSLMODE:-require}
+    # Les données sont désormais chargées depuis la base distante, pas besoin de volume data local
+    # volumes:
+    #   - ./data:/app/data
 
     restart: unless-stopped
 

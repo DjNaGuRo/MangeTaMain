@@ -494,7 +494,7 @@ def load_recipes_data_from_db() -> pd.DataFrame:
         if engine is None:
             init_database()
             
-        query = f"SELECT * FROM {TABLE_RAW_RECIPES} ORDER BY recipe_id"
+        query = f"SELECT * FROM {TABLE_RAW_RECIPES} ORDER BY id"
         df = pd.read_sql_query(query, engine)
             
         logger.info(f"Successfully loaded recipes data from DB: {df.shape[0]} rows, {df.shape[1]} columns")
@@ -534,7 +534,7 @@ def load_clean_recipes_from_db() -> pd.DataFrame:
         if engine is None:
             init_database()
             
-        query = f"SELECT * FROM {TABLE_CLEAN_RECIPES} ORDER BY recipe_id"
+        query = f"SELECT * FROM {TABLE_CLEAN_RECIPES} ORDER BY id"
         df = pd.read_sql_query(query, engine)
             
         logger.info(f"Successfully loaded cleaned recipes from DB: {df.shape[0]} rows, {df.shape[1]} columns")
@@ -571,8 +571,8 @@ def load_clean_merged_from_db() -> pd.DataFrame:
         
         if engine is None:
             init_database()
-            
-        query = f"SELECT * FROM {TABLE_CLEAN_MERGED} ORDER BY recipe_id, user_id"
+
+        query = f"SELECT * FROM {TABLE_CLEAN_MERGED} ORDER BY recipe_id"
         df = pd.read_sql_query(query, engine)
             
         logger.info(f"Successfully loaded merged data from DB: {df.shape[0]} rows, {df.shape[1]} columns")

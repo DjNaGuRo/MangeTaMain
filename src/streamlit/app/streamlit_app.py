@@ -6,15 +6,9 @@ import numpy as np
 import sys, inspect
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
-# import os
-# print('CWD:', os.getcwd())
-# print('sys.path:', sys.path)
-# print('CWD:', os.getcwd())
-# print('src exists:', Path('src').exists())
-# print('ensure_data exists:', Path('src/ensure_data.py').exists())
 
 import yaml
-from src.ensure_data import ensure_data
+#from src.ensure_data import ensure_data
 
 # ---------------------------------------------------------------------------
 # Setup chemin src
@@ -211,9 +205,9 @@ def _set_page_by_key(page_key: str):
 def main():
     if logger:
         logger.info("Initializing Streamlit application main interface")
-    if "data_ready" not in st.session_state:
-        ensure_data()
-        st.session_state.data_ready = True
+    # if "data_ready" not in st.session_state:
+    #     ensure_data()
+    #     st.session_state.data_ready = True
     st.set_page_config(page_title="MangeTaMain", page_icon="🍽️", layout="wide")
     _init_page_state()
 

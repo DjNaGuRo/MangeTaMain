@@ -865,13 +865,16 @@ def minutes_group_negative_reviews_bar(
     show: bool = False,
     return_fig: bool = False,
 ):
-    """Trace le score moyen d’insatisfaction selon la durée de préparation.
+    """
+    Trace le score moyen d’insatisfaction selon la durée de préparation.
 
     Cette fonction regroupe les recettes selon la durée de préparation :
-        - Invalide si minutes = 0 ou manquant
-        - Courte ≤ 30 min
-        - Moyenne 31–180 min
-        - Longue > 180 min
+
+    - Invalide si minutes = 0 ou manquant
+    - Courte ≤ 30 min
+    - Moyenne 31–180 min
+    - Longue > 180 min
+
     Après le filtrage, j’affiche un barplot clair et lisible avec seaborn.
     """
 
