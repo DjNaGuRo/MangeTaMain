@@ -3,8 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-
-    container_name: mangetamain-app
+    image: mangetamain-app-gdrive
+    container_name: mangetamain-app-gdrive
 
     ports:
       - "8501:8501"

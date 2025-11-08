@@ -47,3 +47,6 @@ docs/_templates/
 # Logs
 logs/
 *.log
+
+# Test files to not track
+notebooks/test_notebook.ipynb
