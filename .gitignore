@@ -29,8 +29,8 @@ Thumbs.db
 
 # Docker
 .dockerignore
-data/raw/*.csv
-data/processed/*.csv
+data/raw/*
+data/processed/*
 venv/
 tests/__pycache__/
 MangeTaMain/tests/__pycache__/
