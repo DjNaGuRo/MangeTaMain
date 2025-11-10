@@ -1,15 +1,16 @@
 ## Lancement de l'application
 
-L'application peut être lancé soit via docker compose ou soit directement streamlit run
+L'application peut être lancée via Docker Compose ou directement avec Streamlit.
 
-Tout d'aboord, il faut placez les données brutes dans le répertoire `data/raw` et les données netoyées dans `data/processed` (ces dernières peuvent être obtenues en lançant le notebook `notebooks/data_cleaning.ipynb`)
+**Préparation automatique des données :**
+Au premier lancement, les données seront automatiquement téléchargées et extraites dans `data/raw` et `data/processed` si elles sont absentes, grâce à la fonction `ensure_data` (voir la variable d'environnement `DATA_REMOTE_URL`). Il n'est plus nécessaire de placer manuellement les fichiers ou d'exécuter les notebooks pour préparer les données.
 
-1. Lancez l'application via docker compose:
+1. Lancez l'application via Docker Compose :
 ```bash
 docker compose up
 ```
 
-2. Lancez l'application via Streamlit 
+2. Lancez l'application via Streamlit :
 ```bash
 poetry run streamlit run src/streamlit/app/streamlit_app.py
 ```
@@ -46,16 +47,16 @@ Présentation du projet et aperçu des données
 Synthèse des résultats et perspectives
 
 
-## Utilisation des notebooks
+## Utilisation des notebooks (optionnel)
+
+Les notebooks du dossier `notebooks/` servent à l'exploration, au nettoyage ou à la visualisation avancée des données. Leur utilisation est facultative, car l'application gère automatiquement le téléchargement et la préparation des données.
 
 #### Notebook principal
-
 ```bash
 poetry run jupyter notebook notebooks/data_cleaning.ipynb
 ```
 
 #### Notebook de visualisation
-
 ```bash
 poetry run jupyter notebook notebooks/data_vizualisation.ipynb
 ```

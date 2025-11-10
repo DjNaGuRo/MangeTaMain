@@ -6,10 +6,9 @@
 *.xls
 
 # Cache et build
-__pycache__/
+**/__pycache__/
 *.pyc
 .pytest_cache/
-.streamlit/
 
 # Environnement
 .env
@@ -29,8 +28,8 @@ Thumbs.db
 
 # Docker
 .dockerignore
-data/raw/*.csv
-data/processed/*.csv
+data/raw/*
+data/processed/*
 venv/
 tests/__pycache__/
 MangeTaMain/tests/__pycache__/
@@ -47,3 +46,6 @@ docs/_templates/
 # Logs
 logs/
 *.log
+
+# Test files to not track
+notebooks/test_notebook.ipynb

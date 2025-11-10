@@ -136,7 +136,7 @@ def show_data_page():
         min(5, len(df_raw_interactions)),
         random_state=st.session_state.binary_sample_seed,
     )
-    st.dataframe(sample_df, use_container_width=True)
+    st.dataframe(sample_df, width='stretch')
 
     col_btn, col_info = st.columns([1, 3])
     with col_btn:
@@ -235,12 +235,15 @@ def show_data_page():
         df_raw_recipes.columns.tolist(),
         default=df_raw_recipes.columns.tolist()[:19],
     )
-    st.dataframe(df_raw_recipes[splitted_recipes].head(5), use_container_width=True)
+    st.dataframe(df_raw_recipes[splitted_recipes].head(5), width='stretch')
 
     st.markdown(
-        """ Pour chacune des valeurs nutritionnelles, il également est possible de remarquer des valeurs très extrêmes ! Les valeurs max sont des valeurs abérrantes cependant d'autre valeurs tel que les recettes à plus de 3 000 calories sont potentiellement des recettes avec des scores nutritionnels calculés pour la totalité de la recette et non normalisé (par exemple par portion). les valeurs nutritionnels pour une portion sont d'environs 200~800 kcal. Comme nous n'avons pas d'information sur la quantité considéré (portion ou recette total), on décide donc de supprimer les recettes à plus de 3000 calories sachant qu'ils représentent qu'un très petit pourcentage de recette.  
+        """ Pour chacune des valeurs nutritionnelles, il est également possible de remarquer des valeurs très extrêmes ! 
+        Les valeurs max sont des valeurs abérrantes cependant d'autre valeurs tel que les recettes à plus de 3 000 calories sont potentiellement des recettes avec des scores nutritionnels calculés pour la totalité de la recette et non normalisé (par exemple par portion). 
+        les valeurs nutritionnelles pour une portion sont d'environs 200~800 kcal. 
+        Comme nous n'avons pas d'information sur la quantité considéré (portion ou recette total), on décide donc de supprimer les recettes à plus de 3000 calories sachant qu'ils représentent qu'un très petit pourcentage de recette.  
 
-        De même les valeurs nutrionnels pour :  
+        De même les valeurs nutritionnelles pour :  
         - les glucides : 20 ~ 100 g > suppression des recettes à plus de 500g  
         - protéines : 10 ~ 100 g > suppression des recettes à plus de 500g  
         - Sodium : 200 ~ 1500 mg > suppression des recettes à plus de 5000mg  """
