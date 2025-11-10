@@ -14,22 +14,6 @@ from src.ensure_data import ensure_data
 
 load_dotenv()
 
-# ---------------------------------------------------------------------------
-# Setup chemin src
-# ---------------------------------------------------------------------------
-# def _ensure_src_on_path():
-#     root = Path(__file__).resolve()
-#     for p in [root, *root.parents]:
-#         if (p / "pyproject.toml").exists():
-#             project_root = p
-#             break
-#     else:
-#         project_root = Path.cwd()
-#     for add in (project_root, project_root / "src"):
-#         s = str(add)
-#         if s not in sys.path:
-#             sys.path.insert(0, s)
-#     return project_root
 
 
 # Initialize logging

@@ -103,7 +103,6 @@ def show_visualizations():
 
     with tabs[1]:
         render_viz("Top utilisateurs actifs", top_users_by_activity, df_inter)
-        render_viz("Activité (buckets) vs note moyenne", activity_bucket_bar, df_inter)
         render_viz(
             "Nombre d'avis vs moyenne (échantillon)",
             user_count_vs_mean_rating,
@@ -134,18 +133,19 @@ Nous décidons aussi de le garder dans notre jeu de donnée d'autant plus que ce
         )
         st.markdown(
             """Sur ce graphique nous avons catégorisé les temps de préparation : 
-- Très rapide : $ \leq 15 $ min
+- Très rapide : < 15 min
 - Rapide      : 16 ~ 30 min
 - Moyen       : 31 ~ 60 min
 - Long        : 1 ~ 2 heures
 - Très long   : 2 ~ 4 heures
-- Extrême     : $ \geq 4 $ heures
+- Extrême     : > 4 heures
 
 Nous observons que la plupart des recettes prennent au plus 2 heures de prépartations. 
-à noté que les recettes avec 0 min de temps de préparation sont aussi inclus dans la catégorie "très rapide", 
-cependant en faisant le calcul ci-dessous nous pouvons voir que ces recettes représentent une très petite partie (0.43%). 
+À noter que les recettes avec 0 min de temps de préparation sont aussi inclus dans la catégorie "très rapide", 
+cependant ces recettes représentent une très petite partie (0.43%) de la totalité. 
 Cela n'influence donc pas la distribution entière, nous pouvons donc affirmer que la plupart des recettes prennent bien au plus 2 heures de préparations"""
         )
+        st.markdown("""**Ingrédients**""")
 
         render_viz(
             "Ingrédients + Pareto",
@@ -157,7 +157,14 @@ Cela n'influence donc pas la distribution entière, nous pouvons donc affirmer q
             """"Les 618 ingrédients les plus utilisés dans les recettes représentent 80% des ingrédients les plus utilisés"""
         )
 
+        st.markdown("""**Nombre d'étapes**""")
         render_viz("Nombre d'étapes", plot_n_steps_distribution, df_merged)
+
+        st.markdown(
+            """Les recettes ont en moyenne 9 étapes par recette et les recettes avec maximum 10 étapes représentent
+                    environ 55% des recettes. La recette avec le plus d'étapes en contient 143, ce qui est un cas extrême, mais cette recette
+                    ne comporte pas d'avis négatif."""
+        )
         if df_merged is not None and "tags" in df_merged.columns:
             render_viz("Distribution des tags", plot_tags_distribution, df_merged)
             if st.checkbox("Afficher stats tags"):
@@ -165,6 +172,12 @@ Cela n'influence donc pas la distribution entière, nous pouvons donc affirmer q
                     st.dataframe(analyse_tags(df_merged))
                 except Exception as e:
                     st.error(e)
+
+        st.markdown(
+            """Les tags sont une caractéristique intéressante à analyser car ils permettent de catégoriser les recettes, 
+                    et peuvent donner des indications sur le niveau d'insatisfaction des recettes.  
+                    Les recettes comportent en moyenne 18 tags."""
+        )
         if df_clean_recipes is not None and st.checkbox("Stats ingrédients vectorisés"):
             st.dataframe(analyze_ingredients_vectorized(df_clean_recipes))
 
@@ -183,8 +196,8 @@ Cela n'influence donc pas la distribution entière, nous pouvons donc affirmer q
                 )
 
                 st.markdown(
-                    """Les analyses menées sur la durée de préparation et le nombre d’ingrédients montrent qu’il n’existe pas de relation significative entre ces variables et le score d’insatisfaction des utilisateurs.
-Autrement dit, une recette longue ou complexe n’est pas forcément plus critiquée qu’une recette simple ou rapide. 
+                    """Les analyses menées sur la durée de préparation  et le nombre d’ingrédients montrent qu’il n’existe pas de 
+                    relation significative entre ces variables et le score d’insatisfaction des utilisateurs (à noté : faible corrélation apparente pour le temps de préparation).
 Ces résultats suggèrent que les facteurs techniques — tels que le temps nécessaire ou la complexité de la recette — ne sont pas les principaux déterminants de la satisfaction.
 Les utilisateurs semblent plutôt juger les recettes selon des critères qualitatifs (goût, type de plat, attentes personnelles, ou présentation) plutôt que sur la durée ou la difficulté.
 Ainsi, le niveau d’insatisfaction ne dépend pas directement de l’effort ou du temps investi, mais davantage de l’expérience gustative perçue ou de la catégorie culinaire.
@@ -201,27 +214,17 @@ En conclusion, il devient pertinent de poursuivre l’étude en se concentrant s
                 )
 
                 st.markdown(
-                    """Le graphique montre les 10 catégories de recettes (tags) présentant les scores moyens d’insatisfaction les plus élevés.
-
+                    """Le graphique montre les 10 catégories de recettes (tags) présentant les scores moyens d’insatisfaction les plus élevés.  
 Les tags comme “equipment”, “meat”, “number-of-servings” ou “main-dish” apparaissent en tête, indiquant que les recettes associées à ces catégories sont plus souvent critiquées par les utilisateurs.
 
-Ces résultats peuvent s’expliquer par plusieurs facteurs :
-
-Les recettes “equipment” ou “meat” nécessitent souvent du matériel spécifique ou une maîtrise technique (cuissons précises, températures, ustensiles adaptés), ce qui augmente le risque d’échec.
-
+Ces résultats peuvent s’expliquer par plusieurs facteurs :  
+Les recettes “equipment” ou “meat” nécessitent souvent du matériel spécifique ou une maîtrise technique (cuissons précises, températures, ustensiles adaptés), ce qui augmente le risque d’échec.  
 Les plats “main-dish” ou “occasion” sont généralement préparés pour des repas importants, donc les attentes des utilisateurs sont plus fortes.
 
 
-À l’inverse, des tags plus généraux ou rapides comme “60-minutes-or-less” obtiennent des scores d’insatisfaction plus faibles, ce qui reflète des recettes plus simples et accessibles.
-
 Conclusion : Cette analyse confirme que le type de recette (capturé par les tags) joue un rôle déterminant dans la perception des utilisateurs.
 Les critiques ne concernent pas tant la durée ou la complexité, mais plutôt le contexte culinaire et les attentes liées à chaque catégorie.
-
-On observe que certains tags très fréquents (comme dietary, main-dish) ont un score d’insatisfaction moyen autour de 2, ce qui indique qu’ils sont à la fois populaires et moyennement critiqués.
-
-En revanche, equipment est peu fréquent mais très critiqué (score proche de 2.8).
-
-Cela signifie que la popularité n’est pas forcément liée à la satisfaction : un tag peut être très commun et pourtant globalement apprécié, ou rare mais très mal noté."""
+"""
                 )
 
     with tabs[4]:

@@ -6,6 +6,7 @@ Mes visualisations univariées / bivariées pour la table `interactions`.
 """
 
 from __future__ import annotations
+import streamlit as st
 
 import ast
 from typing import Optional, Sequence, Tuple, List
@@ -19,7 +20,8 @@ import seaborn as sns
 # Initialize logging for visualizations
 try:
     from .logging_config import get_logger
-    logger = get_logger('visualization')
+
+    logger = get_logger("visualization")
 except Exception as e:
     print(f"Warning: Could not initialize logging in data_visualization: {e}")
     logger = None
@@ -64,6 +66,7 @@ def _finalize(fig: plt.Figure, show: bool, return_fig: bool):
 # ---------------------------------------------------------------------
 # 1) Distribution des notes 1..5 + KDE
 # ---------------------------------------------------------------------
+@st.cache_data
 def rating_distribution(
     interactions: pd.DataFrame,
     show: bool = False,
@@ -74,16 +77,20 @@ def rating_distribution(
     try:
         if logger:
             logger.debug(f"Generating rating distribution visualization (kde={kde})")
-        
+
         _need_cols(interactions, ["rating"])
         s = pd.to_numeric(interactions["rating"], errors="coerce").dropna()
         s = s[(s >= 1) & (s <= 5)]
-        
+
         if logger:
-            logger.debug(f"Rating data: {len(s)} valid ratings out of {len(interactions)} total")
+            logger.debug(
+                f"Rating data: {len(s)} valid ratings out of {len(interactions)} total"
+            )
 
         fig, ax = plt.subplots(figsize=(6, 4))
-        ax.hist(s, bins=[0.5, 1.5, 2.5, 3.5, 4.5, 5.5], color=PALETTE[1], edgecolor="white")
+        ax.hist(
+            s, bins=[0.5, 1.5, 2.5, 3.5, 4.5, 5.5], color=PALETTE[1], edgecolor="white"
+        )
         ax.set_title("Distribution des notes valides")
         ax.set_xlabel("Note")
         ax.set_ylabel("Nombre d'occurrences")
@@ -92,7 +99,7 @@ def rating_distribution(
 
         if kde:
             sns.kdeplot(s, ax=ax, color=PALETTE[5], lw=2)
-        
+
         if logger:
             logger.debug("Successfully generated rating distribution plot")
 
@@ -106,6 +113,7 @@ def rating_distribution(
 # fonction d'affichage des boxplots minutes, n_ingredients, n_steps
 
 
+@st.cache_data
 def plot_minutes_ningredients_nsteps(
     data_recipes: pd.DataFrame, show: bool = False, return_fig: bool = False
 ):
@@ -141,6 +149,7 @@ def plot_minutes_ningredients_nsteps(
 # ---------------------------------------------------------------------
 # 2) Distribution des moyennes par recette + KDE
 # ---------------------------------------------------------------------
+@st.cache_data
 def recipe_mean_rating_distribution(
     interactions: pd.DataFrame,
     bins: int = 25,
@@ -174,6 +183,7 @@ def recipe_mean_rating_distribution(
 # ---------------------------------------------------------------------
 # 3) Top-10 utilisateurs par activité
 # ---------------------------------------------------------------------
+@st.cache_data
 def top_users_by_activity(
     interactions: pd.DataFrame,
     top_k: int = 10,
@@ -200,6 +210,7 @@ def top_users_by_activity(
 # ---------------------------------------------------------------------
 # 4) Distribution de la moyenne des notes par utilisateur + KDE
 # ---------------------------------------------------------------------
+@st.cache_data
 def user_mean_rating_distribution(
     interactions: pd.DataFrame,
     bins: int = 40,
@@ -229,6 +240,7 @@ def user_mean_rating_distribution(
 # ---------------------------------------------------------------------
 # 5) Scatter : nombre d’avis ↔ note moyenne
 # ---------------------------------------------------------------------
+@st.cache_data
 def user_count_vs_mean_rating(
     interactions: pd.DataFrame,
     sample: Optional[int] = None,
@@ -267,6 +279,7 @@ def user_count_vs_mean_rating(
 # ---------------------------------------------------------------------
 # 6) Activité (mes bornes) ↔ moyenne des notes (barplot seaborn)
 # ---------------------------------------------------------------------
+@st.cache_data
 def activity_bucket_bar(
     interactions: pd.DataFrame,
     bins: Tuple[int, int, int, int] = (0, 1, 10, 60),  # => [0,1,10,60,inf]
@@ -325,6 +338,7 @@ def activity_bucket_bar(
 
 
 # fonction permettant de récupérer l'utilisateur avec le plus d'avis dont le rating est entre 1 et 3 et affiche ses notes
+@st.cache_data
 def get_most_negative_user(interactions: pd.DataFrame) -> int:
     """Récupère l'utilisateur avec le plus d'avis négatifs (notes 1 à 3) et affiche ses statistiques.
     Args:
@@ -357,6 +371,7 @@ def get_most_negative_user(interactions: pd.DataFrame) -> int:
 
 
 ## Anlyse des contributeurs
+@st.cache_data
 def analyze_contributors(
     df_pp_raw_recipes: pd.DataFrame,
     show: bool = False,
@@ -415,6 +430,7 @@ def analyze_contributors(
 
 
 # statistique descriptive pour les variables non catégorielles
+@st.cache_data
 def statistique_descriptive(df: pd.DataFrame, column: str) -> pd.DataFrame:
     """Calcule des statistiques descriptives sur une colonne donnée.
 
@@ -494,6 +510,7 @@ def plot_prep_time_distribution(
 
 
 # Version encore plus rapide avec vectorisation
+@st.cache_data
 def analyze_ingredients_vectorized(df: pd.DataFrame) -> pd.DataFrame:
     """Version vectorisée ultra-rapide.
 
@@ -535,6 +552,7 @@ def analyze_ingredients_vectorized(df: pd.DataFrame) -> pd.DataFrame:
 
 
 # fonction de visualisation pour les ingrédients
+@st.cache_data
 def plot_ingredient(
     df: pd.DataFrame, show: bool = False, return_fig: bool = False
 ) -> Optional[plt.Figure]:
@@ -612,6 +630,7 @@ def plot_ingredient(
 
 
 # fonction de catégorisation du nombre d'étapes
+@st.cache_data
 def categorize_steps(n_steps):
     if n_steps <= 3:
         return "Très simple (≤3 étapes)"
@@ -628,6 +647,7 @@ def categorize_steps(n_steps):
 
 
 # visualisation graphique sur le nombre d'étapes des recettes
+@st.cache_data
 def plot_n_steps_distribution(
     df: pd.DataFrame, show: bool = False, return_fig: bool = False
 ) -> Optional[plt.Figure]:
@@ -689,7 +709,7 @@ def plot_n_steps_distribution(
     axes[0, 1].plot(sorted_steps, cumulative_prob, linewidth=2)
     axes[0, 1].set_title("Distribution cumulative")
     axes[0, 1].set_xlabel("Nombre d'étapes")
-    axes[0, 1].set_ylabel("Probabilité cumulative")
+    axes[0, 1].set_ylabel("proportion cumulative")
     axes[0, 1].grid(True, alpha=0.3)
 
     colors = ["#ff9999", "#66b3ff", "#99ff99", "#ffcc99", "#ff99cc", "#c2c2f0"]
@@ -707,6 +727,7 @@ def plot_n_steps_distribution(
 
 
 # étude de la variable tags
+@st.cache_data
 def analyse_tags(df: pd.DataFrame) -> pd.DataFrame:
     """Analyse de la variable 'tags' dans le dataset des recettes nettoyées.
 
@@ -776,6 +797,7 @@ def analyse_tags(df: pd.DataFrame) -> pd.DataFrame:
 
 
 # fonction de visualisation distribution du nombre de tags par recette
+@st.cache_data
 def plot_tags_distribution(
     df: pd.DataFrame, show: bool = False, return_fig: bool = False
 ) -> Optional[plt.Figure]:
@@ -816,6 +838,7 @@ def plot_tags_distribution(
 
 
 ### fonction permettant d'afficher la distribution des calories, du sucre et des protéines, saturated fat, total fat, carbohydrates et sodium
+@st.cache_data
 def plot_nutrition_distribution(
     df: pd.DataFrame, show: bool = False, return_fig: bool = False
 ) -> Optional[plt.Figure]:
@@ -858,6 +881,7 @@ def plot_nutrition_distribution(
 # ---------------------------------------------------------------------
 # BIVARIÉ — Durée (minutes) → groupes → insatisfaction
 # ---------------------------------------------------------------------
+@st.cache_data
 def minutes_group_negative_reviews_bar(
     merged_df: pd.DataFrame,
     minutes_col: str = "minutes",
@@ -937,6 +961,7 @@ def minutes_group_negative_reviews_bar(
 
 
 # fonction de corrélation de Spearman
+@st.cache_data
 def spearman_correlation(df: pd.DataFrame, col1: str, col2: str) -> float:
     """Calcule le coefficient de corrélation de Spearman entre deux colonnes.
 
@@ -953,6 +978,7 @@ def spearman_correlation(df: pd.DataFrame, col1: str, col2: str) -> float:
 
 
 ###visualison de la distribution du nombre d'ingrédients par recette en fonction du score d'insatisfaction
+@st.cache_data
 def plot_ingredients_vs_negative_score(
     merged_df: pd.DataFrame, show: bool = False, return_fig: bool = False
 ):
@@ -976,6 +1002,7 @@ def plot_ingredients_vs_negative_score(
 
 
 ### analyse de la corrélation entre les tags et le score d'insatisfaction
+@st.cache_data
 def analyze_tags_correlation(
     merged_df: pd.DataFrame, show: bool = False, return_fig: bool = False
 ):
@@ -1067,6 +1094,7 @@ def analyze_tags_correlation(
 
 
 # correlation entre les caractéristiques nutritionnelles et le score d'insatisfaction
+@st.cache_data
 def nutrition_correlation_analysis(
     merged_df: pd.DataFrame, show: bool = False, return_fig: bool = False
 ):
